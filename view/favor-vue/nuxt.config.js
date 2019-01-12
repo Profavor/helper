@@ -3,6 +3,14 @@ const pkg = require('./package')
 module.exports = {
   mode: 'spa',
 
+  server: {
+    port: 3000,
+    host: '0.0.0.0'
+  },
+  env: {
+
+  },
+
   /*
   ** Headers of the page
   */
@@ -90,8 +98,8 @@ module.exports = {
 
   proxy: {
     // Simple proxy
-    '/api': 'http://localhost:8080',
-    '/auth': 'http://localhost:8080'
+    '/api': 'http://0.0.0.0:8080',
+    '/auth': 'http://0.0.0.0:8080'
   },
 
   /*
