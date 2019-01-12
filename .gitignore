@@ -30,7 +30,6 @@
 
 /doc/
 /env
-/m-scheduler-secret.yaml
 /config
 /gradlew
 /gradlew.bat
