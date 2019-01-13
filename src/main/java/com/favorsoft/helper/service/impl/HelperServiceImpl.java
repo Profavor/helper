@@ -1,9 +1,12 @@
 package com.favorsoft.helper.service.impl;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import com.favorsoft.helper.entity.Helper;
@@ -19,6 +22,9 @@ import com.favorsoft.helper.service.HelperService;
 @Service
 public class HelperServiceImpl implements HelperService{
 	private final String PROJECT_STATUS_OPEN = "OPEN";
+	private final String PROJECT_STATUS_CLOSE = "CLOSE";
+	private final String REQUEST_STATUS_HANDUP = "HAND_UP";
+	private final String REQUEST_STATUS_HANDDOWN = "HAND_DOWN";
 	
 	@Autowired
 	private HelperRepository helperRepository;
@@ -59,11 +65,64 @@ public class HelperServiceImpl implements HelperService{
 	}
 
 	@Override
-	public void saveProjectShift(ProjectShift projectShift) {		
+	public void saveProjectShift(ProjectShift projectShift) {
 		Project project = getProject(projectShift.getProjectId()).get();
-		projectShift.setProject(project);		
-		projectShiftRepository.save(projectShift);		
+		projectShift.setProject(project);
+		
+		ProjectShift tempProjectShift = getProjectShift(project, projectShift.getHelpDate());
+		
+		if(tempProjectShift == null) {
+			projectShiftRepository.save(projectShift);	
+		}else {
+			updateProjectShift(tempProjectShift, projectShift);	
+		}			
 	}
+	
+	@Override
+	public void handupHelper(ProjectShift projectShift) throws Exception {
+		Authentication auth =  SecurityContextHolder.getContext().getAuthentication();
+		
+		Helper helper = getHelper(auth.getName());
+		ShiftHelperRequest shiftHelperRequest = shiftHelperRequestRepositry.findByProjectShiftAndHelper(projectShift, helper);
+		if(shiftHelperRequest == null) {
+			shiftHelperRequest = new ShiftHelperRequest(projectShift, helper);
+		}		
+		
+		shiftHelperRequest.setRequestDate(new Date());
+		shiftHelperRequest.setStatus(REQUEST_STATUS_HANDUP);
+		
+		boolean exist = false;
+		for(ShiftHelperRequest request: projectShift.getRequests()) {
+			if(auth.getName().equals(request.getHelper().getKnoxId())){
+				request.setRequestDate(new Date());
+				request.setStatus(REQUEST_STATUS_HANDUP);
+				exist = true;
+				break;
+			}			
+		}
+		
+		if(!exist) {
+			projectShift.getRequests().add(shiftHelperRequest);
+		}
+		
+		projectShiftRepository.save(projectShift);	
+	}
+	
+	@Override
+	public void handdownHelper(ProjectShift projectShift) throws Exception {
+		Authentication auth =  SecurityContextHolder.getContext().getAuthentication();
+		
+		Helper helper = getHelper(auth.getName());
+		ShiftHelperRequest shiftHelperRequest = shiftHelperRequestRepositry.findByProjectShiftAndHelper(projectShift, helper);
+		if(shiftHelperRequest == null) {
+			throw new Exception("지원 이력이 존재하지 않는 봉사자입니다.");
+		}		
+		shiftHelperRequest.setRequestDate(new Date());
+		shiftHelperRequest.setStatus(REQUEST_STATUS_HANDDOWN);
+		
+		shiftHelperRequestRepositry.save(shiftHelperRequest);
+	}
+	
 
 	@Override
 	public void saveShiftHelperRequest(ShiftHelperRequest shiftHelperRequest) {
@@ -123,7 +182,18 @@ public class HelperServiceImpl implements HelperService{
 	}
 
 	@Override
-	public List<ProjectShift> getProjectShiftList() {
-		return projectShiftRepository.findAll();
+	public List<ProjectShift> getProjectShiftList(String projectId) {
+		Project project = getProject(projectId).get();
+		return projectShiftRepository.findByProjectAndStatus(project, PROJECT_STATUS_OPEN);
+	}
+
+	@Override
+	public void updateProjectShift(ProjectShift oldProjectShift, ProjectShift newProjectShift) {
+		oldProjectShift.setStatus(newProjectShift.getStatus());		
+	}
+
+	@Override
+	public ProjectShift getProjectShift(Project project, Date helpDate) {
+		return  projectShiftRepository.findByProjectAndHelpDate(project, helpDate);
 	}
 }

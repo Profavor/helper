@@ -1,5 +1,6 @@
 package com.favorsoft.helper.service;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -17,6 +18,8 @@ public interface HelperService {
 
 	public void saveProjectShift(ProjectShift projectShift);
 	
+	public void updateProjectShift(ProjectShift oldProjectShift, ProjectShift newProjectShift);
+	
 	public void saveShiftHelperRequest(ShiftHelperRequest shiftHelperRequest);
 	
 	public Project getProjectByProjectName(String projectName);
@@ -33,5 +36,11 @@ public interface HelperService {
 
 	public Project updateProject(Project oldProject, Project newProject);
 	
-	public List<ProjectShift> getProjectShiftList();
+	public List<ProjectShift> getProjectShiftList(String projectId);
+	
+	public ProjectShift getProjectShift(Project project, Date helpDate);
+
+	public void handupHelper(ProjectShift projectShift) throws Exception;
+
+	public void handdownHelper(ProjectShift projectShift) throws Exception;
 }

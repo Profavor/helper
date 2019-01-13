@@ -14,6 +14,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 import javax.persistence.UniqueConstraint;
@@ -21,6 +22,8 @@ import javax.persistence.UniqueConstraint;
 import org.hibernate.annotations.GenericGenerator;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.favorsoft.shared.entity.BaseEntity;
 
 @Entity
@@ -38,6 +41,7 @@ public class ProjectShift extends BaseEntity{
     @JoinColumn(name="project_id", referencedColumnName = "id")
     private Project project;
 	
+	@JsonFormat(pattern="yyyy-MM-dd")
 	@Column(name="help_date")
 	private Date helpDate;
 	
@@ -49,6 +53,10 @@ public class ProjectShift extends BaseEntity{
     inverseJoinColumns = @JoinColumn(name = "helper_id"),
     uniqueConstraints= @UniqueConstraint(columnNames= {"project_shift_id", "helper_id"}))
 	private List<Helper> helpers = new ArrayList<Helper>();
+	
+	@JsonManagedReference
+	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+	private List<ShiftHelperRequest> requests = new ArrayList<ShiftHelperRequest>();
 	
 	@Transient
     private String projectId;
@@ -99,6 +107,14 @@ public class ProjectShift extends BaseEntity{
 
 	public void setProjectId(String projectId) {
 		this.projectId = projectId;
+	}
+
+	public List<ShiftHelperRequest> getRequests() {
+		return requests;
+	}
+
+	public void setRequests(List<ShiftHelperRequest> requests) {
+		this.requests = requests;
 	}
 	
 }

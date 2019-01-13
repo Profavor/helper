@@ -1,8 +1,10 @@
 package com.favorsoft.helper.controller;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -19,6 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.favorsoft.helper.entity.Helper;
 import com.favorsoft.helper.entity.Project;
 import com.favorsoft.helper.entity.ProjectShift;
+import com.favorsoft.helper.entity.ShiftHelperRequest;
 import com.favorsoft.helper.service.HelperService;
 import com.favorsoft.shared.model.DropdownModel;
 import com.favorsoft.shared.model.ResponseModel;
@@ -36,9 +39,9 @@ public class HelperController {
 	}
 	
 	@RequestMapping("/getProjectShiftList")
-	public List<ProjectShift> getProjectShiftList(){		
-		List<ProjectShift> list = helperService.getProjectShiftList();
-		return list;
+	public List<ProjectShift> getProjectShiftList(@RequestParam String projectId){		
+		List<ProjectShift> list = helperService.getProjectShiftList(projectId);
+		return list.stream().sorted(Comparator.comparing(ProjectShift::getHelpDate)).collect(Collectors.toList());
 	}
 
 	@RequestMapping("/project/list/dropdown")
@@ -84,6 +87,37 @@ public class HelperController {
 		return res;
 	}
 	
+	@RequestMapping(value="/project/shift/request/handup", method=RequestMethod.POST)
+	public ResponseModel handupHelper(@RequestBody ProjectShift projectShift) {
+		ResponseModel res = new ResponseModel();
+		try {		
+			Optional<Project> project = helperService.getProject(projectShift.getProjectId());
+			projectShift = helperService.getProjectShift(project.get(), projectShift.getHelpDate());
+			
+			helperService.handupHelper(projectShift);
+			res.setSuccess(true);
+		}catch(Exception e) {
+			res.setSuccess(false);
+			res.setMessage(e.getMessage());
+		}		
+		return res;
+	}
+	
+	@RequestMapping(value="/project/shift/request/handdown", method=RequestMethod.POST)
+	public ResponseModel handdownHelper(@RequestBody ProjectShift projectShift) {
+		ResponseModel res = new ResponseModel();
+		try {		
+			Optional<Project> project = helperService.getProject(projectShift.getProjectId());
+			projectShift = helperService.getProjectShift(project.get(), projectShift.getHelpDate());
+			
+			helperService.handdownHelper(projectShift);
+			res.setSuccess(true);
+		}catch(Exception e) {
+			res.setSuccess(false);
+			res.setMessage(e.getMessage());
+		}		
+		return res;
+	}	
 	
 	@RequestMapping(value="/project/save", method=RequestMethod.POST)
 	public ResponseModel createProject(@RequestBody Project project) {

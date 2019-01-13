@@ -5,7 +5,7 @@ module.exports = {
 
   server: {
     port: 3000,
-    host: '0.0.0.0'
+    host: '49.170.96.2'
   },
   env: {
 
@@ -28,7 +28,8 @@ module.exports = {
       {src: 'https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js'},
       {src: '/semantic-ui/semantic.min.js'},
       {src: '/js/calendar.min.js'},
-      {src: '/js/common.util.js'}
+      {src: '/js/polyfill.min.js'},
+      {src: '/js/common.util.js'},
     ]
   },
 
@@ -41,7 +42,7 @@ module.exports = {
   ** Global CSS
   */
   css: [
-    '~/static/semantic-ui/semantic.min.css'
+    '~/static/semantic-ui/semantic.min.css',
   ],
 
   /*
@@ -65,13 +66,16 @@ module.exports = {
     '@nuxtjs/axios',
     '@nuxtjs/auth',
     '@nuxtjs/proxy',
-    '@nuxtjs/toast'
+    '@nuxtjs/toast',
+    '@nuxt/babel-preset-app'
   ],
   /*
   ** Axios module configuration
   */
   axios: {
     // See https://github.com/nuxt-community/axios-module#options
+    // proxyHeaders: true
+      proxy: true
   },
 
   toast: {
@@ -98,8 +102,8 @@ module.exports = {
 
   proxy: {
     // Simple proxy
-    '/api': 'http://0.0.0.0:8080',
-    '/auth': 'http://0.0.0.0:8080'
+    '/api': 'http://49.170.96.2:8080',
+    '/auth': 'http://49.170.96.2:8080'
   },
 
   /*
@@ -109,8 +113,15 @@ module.exports = {
     /*
     ** You can extend webpack config here
     */
-    extend(config, ctx) {
-      
+   babel: {
+    presets: [
+      '@babel/preset-env'
+    ],
+    plugins: ['@babel/plugin-syntax-dynamic-import', '@babel/plugin-transform-arrow-functions', '@babel/plugin-transform-async-to-generator', '@babel/plugin-transform-runtime']
+    },   
+
+    extend(config, { ctx }) {
+
     }
   }
 }

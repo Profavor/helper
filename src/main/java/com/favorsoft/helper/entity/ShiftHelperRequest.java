@@ -11,6 +11,8 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
+import javax.persistence.Transient;
+import javax.persistence.UniqueConstraint;
 
 import org.hibernate.annotations.GenericGenerator;
 
@@ -18,8 +20,15 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.favorsoft.shared.entity.BaseEntity;
 
 @Entity
-@Table(name="shift_helper_request")
+@Table(name="shift_helper_request", uniqueConstraints=@UniqueConstraint(columnNames= {"id", "helper_id"}))
 public class ShiftHelperRequest extends BaseEntity{
+	
+	public ShiftHelperRequest() {}
+	
+	public ShiftHelperRequest(ProjectShift projectShift, Helper helper) {
+		this.projectShift = projectShift;
+		this.helper = helper;
+	}
 	
 	@Id
     @GeneratedValue(generator="system-uuid")
@@ -39,6 +48,9 @@ public class ShiftHelperRequest extends BaseEntity{
 	private Helper helper;
 	
 	private String status;
+	
+	@Transient
+    private String projectShiftId;
 
 	public String getId() {
 		return id;
@@ -79,6 +91,12 @@ public class ShiftHelperRequest extends BaseEntity{
 	public void setStatus(String status) {
 		this.status = status;
 	}
-	
-	
+
+	public String getProjectShiftId() {
+		return projectShiftId;
+	}
+
+	public void setProjectShiftId(String projectShiftId) {
+		this.projectShiftId = projectShiftId;
+	}	
 }

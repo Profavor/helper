@@ -18,6 +18,7 @@ import javax.persistence.UniqueConstraint;
 
 import org.hibernate.annotations.GenericGenerator;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.favorsoft.shared.entity.BaseEntity;
 
 @Entity
@@ -39,8 +40,10 @@ public class Project extends BaseEntity{
 	@Column(nullable=false)
 	private int maxHelperCount;
 	
+	@JsonFormat(pattern="yyyy-MM-dd")
 	private Date startDate;
 	
+	@JsonFormat(pattern="yyyy-MM-dd")
 	private Date endDate;
 	
 	private String status;
