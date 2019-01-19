@@ -102,8 +102,8 @@ module.exports = {
 
   proxy: {
     // Simple proxy
-    '/api': 'http://127.0.0.1:31701',
-    '/auth': 'http://127.0.0.1:31701'
+    '/api': 'http://helper-service:3000',
+    '/auth': 'http://helper-service:3000'
   },
 
   /*
