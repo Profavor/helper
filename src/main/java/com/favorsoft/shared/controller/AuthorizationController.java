@@ -3,6 +3,8 @@ package com.favorsoft.shared.controller;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -17,6 +19,8 @@ import com.favorsoft.shared.service.UsrService;
 @RestController
 @RequestMapping("/auth")
 public class AuthorizationController {
+	private final Logger looger = LoggerFactory.getLogger(AuthorizationController.class);
+	
 	@Autowired
 	private UsrService usrService;
 	
@@ -45,6 +49,8 @@ public class AuthorizationController {
 		}catch(Exception e) {
 			responseModel.setSuccess(false);
 			responseModel.setMessage(e.getMessage());
+			looger.info(e.getMessage(), e);
+			
 		}
 		return responseModel;
 	}
