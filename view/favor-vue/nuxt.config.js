@@ -5,7 +5,7 @@ module.exports = {
 
   server: {
     port: 3000,
-    host: '49.170.96.2'
+    host: '0.0.0.0'
   },
   env: {
 
@@ -102,8 +102,8 @@ module.exports = {
 
   proxy: {
     // Simple proxy
-    '/api': 'http://49.170.96.2:8080',
-    '/auth': 'http://49.170.96.2:8080'
+    '/api': 'http://127.0.0.1:31701',
+    '/auth': 'http://127.0.0.1:31701'
   },
 
   /*
