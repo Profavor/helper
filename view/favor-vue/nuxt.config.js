@@ -102,8 +102,8 @@ module.exports = {
 
   proxy: {
     // Simple proxy
-    '/api': 'http://labs.prusoft.space:31701',
-    '/auth': 'http://labs.prusoft.space:31701'
+    '/api': 'http://127.0.0.1:31701',
+    '/auth': 'http://127.0.0.1:31701'
   },
 
   /*
