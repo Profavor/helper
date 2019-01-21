@@ -4,6 +4,7 @@ import java.time.ZonedDateTime;
 import java.util.Date;
 import java.util.UUID;
 
+import javax.transaction.Transactional;
 import javax.validation.Valid;
 
 import org.quartz.JobBuilder;
@@ -28,6 +29,7 @@ import com.favorsoft.schedule.model.ScheduleEmailRequest;
 import com.favorsoft.schedule.model.ScheduleResponse;
 
 @RestController
+@Transactional
 public class EmailJobSchedulerController {
     private static final Logger logger = LoggerFactory.getLogger(EmailJobSchedulerController.class);
 
