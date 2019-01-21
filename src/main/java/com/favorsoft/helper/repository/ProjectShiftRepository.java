@@ -13,6 +13,8 @@ import com.favorsoft.helper.entity.ProjectShift;
 @Repository
 public interface ProjectShiftRepository extends JpaRepository<ProjectShift, String> {
 	
+	List<ProjectShift> findByProject(Project project);
+	
 	List<ProjectShift> findByProjectAndStatus(Project project, String status);
 	
 	ProjectShift findByProjectAndHelpDate(Project project, Date helpDate);

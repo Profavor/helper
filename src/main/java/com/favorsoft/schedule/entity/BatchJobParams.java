@@ -26,6 +26,13 @@ public class BatchJobParams extends BaseEntity implements Serializable{
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
+	
+	public BatchJobParams() {}
+	
+	public BatchJobParams(String paramKey, String paramValue) {
+		this.paramKey = paramKey;
+		this.paramValue = paramValue;
+	}
 
 	@Id
     @GeneratedValue(generator="system-uuid")

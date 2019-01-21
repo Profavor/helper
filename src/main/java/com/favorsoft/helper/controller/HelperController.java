@@ -8,6 +8,7 @@ import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.quartz.CronExpression;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -21,7 +22,6 @@ import org.springframework.web.bind.annotation.RestController;
 import com.favorsoft.helper.entity.Helper;
 import com.favorsoft.helper.entity.Project;
 import com.favorsoft.helper.entity.ProjectShift;
-import com.favorsoft.helper.entity.ShiftHelperRequest;
 import com.favorsoft.helper.service.HelperService;
 import com.favorsoft.shared.model.DropdownModel;
 import com.favorsoft.shared.model.ResponseModel;
@@ -32,6 +32,11 @@ public class HelperController {
 	@Autowired
 	private HelperService helperService;
 	
+	@RequestMapping(value="/validCronExpression")
+	public boolean validCronExpression(@RequestParam String triggerValue) {
+		return CronExpression.isValidExpression(triggerValue);
+	}
+	
 	@RequestMapping("/getProjectList")
 	public List<Project> getProjectList(){		
 		List<Project> list = helperService.getProjectList(false);
@@ -40,7 +45,7 @@ public class HelperController {
 	
 	@RequestMapping("/getProjectShiftList")
 	public List<ProjectShift> getProjectShiftList(@RequestParam String projectId){		
-		List<ProjectShift> list = helperService.getProjectShiftList(projectId);
+		List<ProjectShift> list = helperService.getProjectShiftList(projectId, true);
 		return list.stream().sorted(Comparator.comparing(ProjectShift::getHelpDate)).collect(Collectors.toList());
 	}
 

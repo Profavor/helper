@@ -4,6 +4,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
+import org.quartz.SchedulerException;
+
 import com.favorsoft.helper.entity.Helper;
 import com.favorsoft.helper.entity.Project;
 import com.favorsoft.helper.entity.ProjectShift;
@@ -12,7 +14,7 @@ import com.favorsoft.helper.entity.ShiftHelperRequest;
 public interface HelperService {
 	public Helper getHelper(String knoxId);
 	
-	public void saveProject(Project project);
+	public void saveProject(Project project) throws ClassNotFoundException, SchedulerException;
 	
 	public void closeProject(Project project);
 
@@ -36,7 +38,7 @@ public interface HelperService {
 
 	public Project updateProject(Project oldProject, Project newProject);
 	
-	public List<ProjectShift> getProjectShiftList(String projectId);
+	public List<ProjectShift> getProjectShiftList(String projectId, boolean isOpen);
 	
 	public ProjectShift getProjectShift(Project project, Date helpDate);
 

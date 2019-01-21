@@ -1,0 +1,22 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: helper
+  labels:
+    app: helper
+spec:
+  strategy:
+    type: Recreate
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: helper
+        tier: compute
+    spec:  
+      containers:
+        - image: profavor/helper:1.0
+          imagePullPolicy: Always
+          name: helper
+          ports:
+            - containerPort: 3000

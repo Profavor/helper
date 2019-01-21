@@ -31,6 +31,7 @@ public class BatchJobHistory extends BaseEntity implements Serializable{/**
     
     private String jobParams;
     
+    @Column(length=2000)
     private String message;
 
 	public String getId() {

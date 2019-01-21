@@ -36,6 +36,9 @@ public class Helper extends BaseEntity{
 	@Transient
     private String projectId;
 	
+	@Transient
+    private int helpCount;
+	
 	public String getKnoxId() {
 		return knoxId;
 	}
@@ -83,5 +86,11 @@ public class Helper extends BaseEntity{
 	}
 	public void setProjectId(String projectId) {
 		this.projectId = projectId;
+	}
+	public int getHelpCount() {
+		return helpCount;
+	}
+	public void setHelpCount(int helpCount) {
+		this.helpCount = helpCount;
 	}
 }

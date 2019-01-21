@@ -36,7 +36,7 @@ public class ShiftHelperRequest extends BaseEntity{
     @Column(name = "id", length = 128)
     private String id;
 	
-	@JsonBackReference
+	@JsonBackReference("requests")
     @ManyToOne(cascade = CascadeType.ALL, targetEntity=ProjectShift.class)
     @JoinColumn(name="project_shift_id", referencedColumnName = "id")
     private ProjectShift projectShift;

@@ -33,3 +33,22 @@ spec:
       - name: mysql-persistent-storage
         persistentVolumeClaim:
           claimName: mysql-pv-claim
+          
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: mariadb
+  labels:
+    app: mariadb
+  annotations:
+    kubernetes.io/ingress.class: "nginx"
+spec:
+  rules:
+    - host: mysql.labs.prusoft.space
+      http:
+        paths:
+          - path: /
+            backend:
+              serviceName: mysql
+              servicePort: 3306

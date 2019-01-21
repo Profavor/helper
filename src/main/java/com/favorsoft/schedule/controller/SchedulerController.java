@@ -22,7 +22,7 @@ import com.favorsoft.schedule.repository.BatchJobTriggerRepository;
 import com.favorsoft.schedule.service.QuartzService;
 
 @RestController
-@RequestMapping("/scheduler")
+@RequestMapping("/api/scheduler")
 public class SchedulerController {
 	private final Logger logger = LoggerFactory.getLogger(SchedulerController.class);
 
@@ -42,7 +42,7 @@ public class SchedulerController {
 	public ScheduleResponse registJob(@RequestBody BatchJob batchJob) {
 		ScheduleResponse response = null;		
 		try {
-			if(!scheduler.checkExists(new JobKey("JOBNAME", "JOBGROUP"))){
+			if(!scheduler.checkExists(new JobKey(batchJob.getJobName(), batchJob.getJobGroup()))){
 				quartzService.register(batchJob);
 				response = new ScheduleResponse(true, batchJob.getJobName(), batchJob.getJobGroup(), "Job regist success!!");
 			}else {

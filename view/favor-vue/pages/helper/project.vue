@@ -277,6 +277,19 @@ export default {
         async registSave(){
             $('#projectRegForm').form('validate form');
             if($('#projectRegForm').form('is valid')){  
+                let flag = true;
+                await this.$axios.get('/api/helper/validCronExpression?triggerValue='+this.project.triggerValue).then(function(res){
+                    console.log(res);
+                    if(!res.data){
+                        alert('추첨일이 Cron Expression식이 아닙니다');
+                        flag = false;
+                    }
+                });
+
+                if(!flag){
+                    return;
+                }
+
                 if(confirm('저장하시겠습니까?')){
                     await this.$axios.post('/api/helper/project/save', this.project).then(res => this.$toast.success('프로젝트가 등록되었습니다.')).catch(err=> this.$toast.error(err));
                     this.getProjectList();
@@ -439,7 +452,7 @@ export default {
         async saveHelper(){
             let that = this;
             $('#helperRegForm').form('validate form');
-            if($('#helperRegForm').form('is valid')){    
+            if($('#helperRegForm').form('is valid')){  
                 if(confirm('저장하시겠습니까?')){
                     await this.$axios.post('/api/helper/project/helper/save', this.helper                        
                     ).then(function(res){

@@ -1,9 +1,14 @@
 package com.favorsoft.helper.service.impl;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
+import javax.transaction.Transactional;
+
+import org.quartz.CronExpression;
+import org.quartz.SchedulerException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -18,13 +23,18 @@ import com.favorsoft.helper.repository.ProjectRepository;
 import com.favorsoft.helper.repository.ProjectShiftRepository;
 import com.favorsoft.helper.repository.ShiftHelperRequestRepository;
 import com.favorsoft.helper.service.HelperService;
+import com.favorsoft.schedule.entity.BatchJob;
+import com.favorsoft.schedule.entity.BatchJobParams;
+import com.favorsoft.schedule.entity.BatchJobTrigger;
+import com.favorsoft.schedule.service.QuartzService;
 
+@Transactional
 @Service
 public class HelperServiceImpl implements HelperService{
-	private final String PROJECT_STATUS_OPEN = "OPEN";
-	private final String PROJECT_STATUS_CLOSE = "CLOSE";
-	private final String REQUEST_STATUS_HANDUP = "HAND_UP";
-	private final String REQUEST_STATUS_HANDDOWN = "HAND_DOWN";
+	public final static String PROJECT_STATUS_OPEN = "OPEN";
+	public final static String PROJECT_STATUS_CLOSE = "CLOSE";
+	public final static String REQUEST_STATUS_HANDUP = "HAND_UP";
+	public final static String REQUEST_STATUS_HANDDOWN = "HAND_DOWN";
 	
 	@Autowired
 	private HelperRepository helperRepository;
@@ -37,6 +47,9 @@ public class HelperServiceImpl implements HelperService{
 	
 	@Autowired
 	private ShiftHelperRequestRepository shiftHelperRequestRepositry;
+	
+	@Autowired
+	private QuartzService quartzService;
 
 	@Override
 	public Helper getHelper(String knoxId) {
@@ -44,8 +57,33 @@ public class HelperServiceImpl implements HelperService{
 	}
 
 	@Override
-	public void saveProject(Project project) {
-		projectRepository.save(project);		
+	public void saveProject(Project project) throws ClassNotFoundException, SchedulerException {
+		if(!CronExpression.isValidExpression(project.getTriggerValue())) {
+			throw new SchedulerException("Cron expression is not valid.");
+		}
+		
+		project = projectRepository.saveAndFlush(project);
+		
+		BatchJob batchJob = new BatchJob();
+		batchJob.setJobName(project.getId());
+		batchJob.setJobGroup("HELPER");
+		batchJob.setDescription(project.getDescription());
+		batchJob.setQueueType("CRON");
+		batchJob.setClassName("com.favorsoft.helper.job.FrontierJob");
+		
+		List<BatchJobParams> batchJobParams = new ArrayList<BatchJobParams>();
+		BatchJobParams batchJobParam = new BatchJobParams("projectId", project.getId());
+		batchJobParam.setBatchJob(batchJob);
+		batchJobParams.add(batchJobParam);	
+		batchJob.setBatchJobParams(batchJobParams);
+		
+		List<BatchJobTrigger> batchJobTriggers = new ArrayList<BatchJobTrigger>();
+		BatchJobTrigger batchJobTrigger = new BatchJobTrigger(batchJob.getJobName(), batchJob.getJobGroup(), project.getTriggerValue());
+		batchJobTrigger.setBatchJob(batchJob);
+		batchJobTriggers.add(batchJobTrigger);
+		batchJob.setBatchJobTriggers(batchJobTriggers);	
+		
+		quartzService.register(batchJob);
 	}
 	
 	@Override
@@ -66,16 +104,14 @@ public class HelperServiceImpl implements HelperService{
 
 	@Override
 	public void saveProjectShift(ProjectShift projectShift) {
-		Project project = getProject(projectShift.getProjectId()).get();
-		projectShift.setProject(project);
+		if(projectShift.getProjectId() != null) {
+			Optional<Project> project = getProject(projectShift.getProjectId());
+			if(project.isPresent() && projectShift.getProject() == null) {
+				projectShift.setProject(project.get());
+			}		
+		}
 		
-		ProjectShift tempProjectShift = getProjectShift(project, projectShift.getHelpDate());
-		
-		if(tempProjectShift == null) {
-			projectShiftRepository.save(projectShift);	
-		}else {
-			updateProjectShift(tempProjectShift, projectShift);	
-		}			
+		projectShiftRepository.save(projectShift);		
 	}
 	
 	@Override
@@ -182,14 +218,21 @@ public class HelperServiceImpl implements HelperService{
 	}
 
 	@Override
-	public List<ProjectShift> getProjectShiftList(String projectId) {
+	public List<ProjectShift> getProjectShiftList(String projectId, boolean isOpen) {
 		Project project = getProject(projectId).get();
-		return projectShiftRepository.findByProjectAndStatus(project, PROJECT_STATUS_OPEN);
+		
+		if(isOpen) {
+			return projectShiftRepository.findByProjectAndStatus(project, PROJECT_STATUS_OPEN);
+		}else {
+			return projectShiftRepository.findByProject(project);
+		}		
 	}
 
 	@Override
 	public void updateProjectShift(ProjectShift oldProjectShift, ProjectShift newProjectShift) {
 		oldProjectShift.setStatus(newProjectShift.getStatus());		
+		oldProjectShift.setHelpers(newProjectShift.getHelpers());
+		projectShiftRepository.save(oldProjectShift);
 	}
 
 	@Override

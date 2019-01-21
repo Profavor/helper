@@ -26,6 +26,14 @@ public class BatchJobTrigger extends BaseEntity implements Serializable{
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
+	
+	public BatchJobTrigger() {}
+	
+	public BatchJobTrigger(String triggerName, String triggerGroup, String triggerValue) {
+		this.triggerName = triggerName;
+		this.triggerGroup = triggerGroup;
+		this.triggerValue = triggerValue;
+	}
 
 	@Id
     @GeneratedValue(generator="system-uuid")

@@ -17,6 +17,8 @@ import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 
 import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.LazyCollection;
+import org.hibernate.annotations.LazyCollectionOption;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.favorsoft.shared.entity.BaseEntity;
@@ -51,7 +53,8 @@ public class Project extends BaseEntity{
 	private String owner;
 	
 	private String triggerValue;
-
+	
+	@LazyCollection(LazyCollectionOption.FALSE)
 	@ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
 	@JoinTable(name = "project_helpers",
     joinColumns = @JoinColumn(name = "project_id"),

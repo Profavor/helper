@@ -34,7 +34,7 @@ public class EmailJobSchedulerController {
     @Autowired
     private Scheduler scheduler;
 
-    @PostMapping("/scheduleEmail")
+    @PostMapping("/api/scheduleEmail")
     public ResponseEntity<ScheduleResponse> scheduleEmail(@Valid @RequestBody ScheduleEmailRequest scheduleEmailRequest) {
         try {
             ZonedDateTime dateTime = ZonedDateTime.of(scheduleEmailRequest.getDateTime(), scheduleEmailRequest.getTimeZone());

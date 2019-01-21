@@ -20,8 +20,9 @@ import javax.persistence.Transient;
 import javax.persistence.UniqueConstraint;
 
 import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.LazyCollection;
+import org.hibernate.annotations.LazyCollectionOption;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.favorsoft.shared.entity.BaseEntity;
@@ -36,9 +37,8 @@ public class ProjectShift extends BaseEntity{
     @Column(name = "id", length = 128)
     private String id;
 	
-	@JsonBackReference
     @ManyToOne(cascade = CascadeType.ALL, targetEntity=Project.class)
-    @JoinColumn(name="project_id", referencedColumnName = "id")
+    @JoinColumn(name="project_id", referencedColumnName = "id", nullable=false)
     private Project project;
 	
 	@JsonFormat(pattern="yyyy-MM-dd")
@@ -47,15 +47,17 @@ public class ProjectShift extends BaseEntity{
 	
 	private String status;
 	
-	@ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+	@LazyCollection(LazyCollectionOption.FALSE)
+	@ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
 	@JoinTable(name = "project_shift_helpers",
     joinColumns = @JoinColumn(name = "project_shift_id"),
     inverseJoinColumns = @JoinColumn(name = "helper_id"),
     uniqueConstraints= @UniqueConstraint(columnNames= {"project_shift_id", "helper_id"}))
 	private List<Helper> helpers = new ArrayList<Helper>();
 	
-	@JsonManagedReference
-	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+	@JsonManagedReference("requests")
+	@LazyCollection(LazyCollectionOption.FALSE)
+	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, targetEntity=ShiftHelperRequest.class)
 	private List<ShiftHelperRequest> requests = new ArrayList<ShiftHelperRequest>();
 	
 	@Transient
