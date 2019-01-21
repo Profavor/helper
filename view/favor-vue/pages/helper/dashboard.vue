@@ -149,6 +149,7 @@ export default {
   created: function(){
       this.usr = this.$auth.$state.user;
       this.getProjectDropdown();
+
   },
   data: function(){
       return {
