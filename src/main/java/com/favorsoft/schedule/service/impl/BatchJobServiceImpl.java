@@ -13,7 +13,7 @@ public class BatchJobServiceImpl implements BatchJobService {
 	@Autowired
 	private BatchJobRepository batchJobRepository;
 
-	@Override
+	@Override 
 	public BatchJob getBatchJob(String jobName, String jobGroup) {
 		return batchJobRepository.findByJobNameAndJobGroup(jobName, jobGroup);
 	}
