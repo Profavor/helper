@@ -40,6 +40,8 @@ public interface HelperService {
 	
 	public List<ProjectShift> getProjectShiftList(String projectId, boolean isOpen);
 	
+	public List<ProjectShift> getProjectShiftBetweenHelpDate(Project project, Date startDate, Date endDate);
+	
 	public ProjectShift getProjectShift(Project project, Date helpDate);
 
 	public void handupHelper(ProjectShift projectShift) throws Exception;
