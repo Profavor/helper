@@ -18,5 +18,7 @@ public interface ProjectShiftRepository extends JpaRepository<ProjectShift, Stri
 	List<ProjectShift> findByProjectAndStatus(Project project, String status);
 	
 	ProjectShift findByProjectAndHelpDate(Project project, Date helpDate);
+	
+	List<ProjectShift> findByProjectAndHelpDateBetween(Project project, Date startDate, Date endDate);
 
 }

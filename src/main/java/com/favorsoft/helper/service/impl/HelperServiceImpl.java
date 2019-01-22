@@ -26,6 +26,7 @@ import com.favorsoft.helper.service.HelperService;
 import com.favorsoft.schedule.entity.BatchJob;
 import com.favorsoft.schedule.entity.BatchJobParams;
 import com.favorsoft.schedule.entity.BatchJobTrigger;
+import com.favorsoft.schedule.service.BatchJobService;
 import com.favorsoft.schedule.service.QuartzService;
 
 @Transactional
@@ -50,6 +51,9 @@ public class HelperServiceImpl implements HelperService{
 	
 	@Autowired
 	private QuartzService quartzService;
+	
+	@Autowired
+	private BatchJobService batchJobService;
 
 	@Override
 	public Helper getHelper(String knoxId) {
@@ -62,28 +66,40 @@ public class HelperServiceImpl implements HelperService{
 			throw new SchedulerException("Cron expression is not valid.");
 		}
 		
-		project = projectRepository.saveAndFlush(project);
+		Optional<Project> tempProject = projectRepository.findById(project.getId());
 		
-		BatchJob batchJob = new BatchJob();
-		batchJob.setJobName(project.getId());
-		batchJob.setJobGroup("HELPER");
-		batchJob.setDescription(project.getDescription());
-		batchJob.setQueueType("CRON");
-		batchJob.setClassName("com.favorsoft.helper.job.FrontierJob");
-		
-		List<BatchJobParams> batchJobParams = new ArrayList<BatchJobParams>();
-		BatchJobParams batchJobParam = new BatchJobParams("projectId", project.getId());
-		batchJobParam.setBatchJob(batchJob);
-		batchJobParams.add(batchJobParam);	
-		batchJob.setBatchJobParams(batchJobParams);
-		
-		List<BatchJobTrigger> batchJobTriggers = new ArrayList<BatchJobTrigger>();
-		BatchJobTrigger batchJobTrigger = new BatchJobTrigger(batchJob.getJobName(), batchJob.getJobGroup(), project.getTriggerValue());
-		batchJobTrigger.setBatchJob(batchJob);
-		batchJobTriggers.add(batchJobTrigger);
-		batchJob.setBatchJobTriggers(batchJobTriggers);	
-		
-		quartzService.register(batchJob);
+		if(!tempProject.isPresent()) {
+			project = projectRepository.saveAndFlush(project);
+			
+			BatchJob batchJob = new BatchJob();
+			batchJob.setJobName(project.getId());
+			batchJob.setJobGroup("HELPER");
+			batchJob.setDescription(project.getDescription());
+			batchJob.setQueueType("CRON");
+			batchJob.setClassName("com.favorsoft.helper.job.FrontierJob");
+			
+			List<BatchJobParams> batchJobParams = new ArrayList<BatchJobParams>();
+			BatchJobParams batchJobParam = new BatchJobParams("projectId", project.getId());
+			batchJobParam.setBatchJob(batchJob);
+			batchJobParams.add(batchJobParam);	
+			batchJob.setBatchJobParams(batchJobParams);
+			
+			List<BatchJobTrigger> batchJobTriggers = new ArrayList<BatchJobTrigger>();
+			BatchJobTrigger batchJobTrigger = new BatchJobTrigger(batchJob.getJobName(), batchJob.getJobGroup(), project.getTriggerValue());
+			batchJobTrigger.setBatchJob(batchJob);
+			batchJobTriggers.add(batchJobTrigger);
+			batchJob.setBatchJobTriggers(batchJobTriggers);	
+			
+			quartzService.register(batchJob);
+		}else {
+			if(!tempProject.get().getTriggerValue().equals(project.getTriggerValue())) {
+				BatchJob batchJob = batchJobService.getBatchJob(project.getId(), "HELPER");
+				List<BatchJobTrigger> batchJobTriggers = batchJob.getBatchJobTriggers();
+				batchJobTriggers.get(0).setTriggerValue(project.getTriggerValue());
+				
+				quartzService.register(batchJob);
+			}
+		}		
 	}
 	
 	@Override
@@ -238,5 +254,10 @@ public class HelperServiceImpl implements HelperService{
 	@Override
 	public ProjectShift getProjectShift(Project project, Date helpDate) {
 		return  projectShiftRepository.findByProjectAndHelpDate(project, helpDate);
+	}
+
+	@Override
+	public List<ProjectShift> getProjectShiftBetweenHelpDate(Project project, Date startDate, Date endDate) {
+		return projectShiftRepository.findByProjectAndHelpDateBetween(project, startDate, endDate);
 	}
 }

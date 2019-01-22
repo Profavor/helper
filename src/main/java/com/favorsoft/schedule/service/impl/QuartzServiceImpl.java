@@ -33,7 +33,7 @@ import com.favorsoft.schedule.repository.BatchJobTriggerRepository;
 import com.favorsoft.schedule.service.QuartzService;
 
 @Service
-@Transactional(readOnly = true)
+@Transactional
 public class QuartzServiceImpl implements QuartzService {
 
 	private static final Logger logger = LoggerFactory.getLogger(QuartzServiceImpl.class);
@@ -61,26 +61,45 @@ public class QuartzServiceImpl implements QuartzService {
 	}
 
 	@Override
-	@Transactional
 	public ScheduleResponse register(BatchJob batchJob) throws SchedulerException, ClassNotFoundException {
+		Scheduler scheduler = schedulerFactoryBean.getScheduler();
 		ScheduleResponse scheduleResponse = null;
 		
-		Scheduler scheduler = schedulerFactoryBean.getScheduler();
-		JobDetail jobDetail = concreteJobDetail(batchJob);
-		List<Trigger> triggers = concreteCronTrigger(batchJob);
-		
-		for(int i=0; i<triggers.size(); i++) {
-			Trigger trigger = triggers.get(i);
-			if(i==0) {
-				scheduler.scheduleJob(jobDetail, trigger);
-			}else {
-				scheduler.scheduleJob(trigger);
+		JobKey jobKey = generateJobKey(batchJob);
+		JobDetail jobDetail = null;
+		if(scheduler.checkExists(jobKey)) {			
+			BatchJobTrigger batchJobTrigger = batchJob.getBatchJobTriggers().get(0);
+			TriggerKey triggerKey = new TriggerKey(batchJobTrigger.getTriggerName(), batchJobTrigger.getTriggerGroup());
+			if(scheduler.checkExists(triggerKey)) {
+				jobDetail = scheduler.getJobDetail(jobKey);
+				Trigger trigger = TriggerBuilder.newTrigger().withIdentity(batchJobTrigger.getTriggerName(), batchJobTrigger.getTriggerGroup()).forJob(jobDetail)
+						.startNow().withSchedule(CronScheduleBuilder.cronSchedule(batchJobTrigger.getTriggerValue()).inTimeZone(TimeZone.getTimeZone("Asia/Seoul"))).build();
+				scheduler.rescheduleJob(triggerKey, trigger);
+			}			
+		}else {
+			jobDetail = concreteJobDetail(batchJob);
+			List<Trigger> triggers = concreteCronTrigger(batchJob);		
+			
+			for(int i=0; i<triggers.size(); i++) {
+				Trigger trigger = triggers.get(i);
+				if(i==0) {
+					scheduler.scheduleJob(jobDetail, trigger);
+				}else {
+					scheduler.scheduleJob(trigger);
+				}
 			}
-		}
+		}		
 
 		scheduleResponse = new ScheduleResponse(true, jobDetail.getKey().getName(),	jobDetail.getKey().getGroup(), "Job regist Successfully!");
-
-		batchJobRepository.save(batchJob);
+		
+		BatchJob tempBatchJob = batchJobRepository.findByJobNameAndJobGroup(batchJob.getJobName(), batchJob.getJobGroup());
+		if(tempBatchJob == null) {
+			batchJobRepository.save(batchJob);
+		}else {
+			batchJobRepository.save(tempBatchJob);
+		}
+		
+		
 
 		return scheduleResponse;
 	}
@@ -99,7 +118,7 @@ public class QuartzServiceImpl implements QuartzService {
 		return jobDetail;
 	}
 
-	private List<Trigger> concreteCronTrigger(BatchJob batchJob) {
+	private List<Trigger> concreteCronTrigger(BatchJob batchJob) throws SchedulerException {
 		List<Trigger> triggerList = new ArrayList<Trigger>();
 		for(int i=0; i<batchJob.getBatchJobTriggers().size(); i++) {
 			BatchJobTrigger trigger = batchJob.getBatchJobTriggers().get(i);
@@ -118,13 +137,14 @@ public class QuartzServiceImpl implements QuartzService {
 	}
 
 	@Override
-	@Transactional
 	public ScheduleResponse delete(BatchJob batchJob) throws SchedulerException {
 		
 		BatchJob temp = batchJobRepository.findByJobNameAndJobGroup(batchJob.getJobName(), batchJob.getJobGroup());
 		Scheduler scheduler = schedulerFactoryBean.getScheduler();
 		JobKey jobKey = generateJobKey(batchJob);
-		scheduler.deleteJob(jobKey);
+		if(scheduler.checkExists(jobKey)) {
+			scheduler.deleteJob(jobKey);
+		}
 		
 		if(temp != null) {
 			batchJobRepository.delete(temp);
@@ -134,7 +154,6 @@ public class QuartzServiceImpl implements QuartzService {
 	}
 
 	@Override
-	@Transactional
 	public ScheduleResponse pause(BatchJob batchJob) throws SchedulerException {
 		Scheduler scheduler = schedulerFactoryBean.getScheduler();
 		JobKey jobKey = generateJobKey(batchJob);
@@ -150,7 +169,6 @@ public class QuartzServiceImpl implements QuartzService {
 	}
 
 	@Override
-	@Transactional
 	public ScheduleResponse resume(BatchJob batchJob) throws SchedulerException {
 		Scheduler scheduler = schedulerFactoryBean.getScheduler();
 		JobKey jobKey = generateJobKey(batchJob);
@@ -173,7 +191,6 @@ public class QuartzServiceImpl implements QuartzService {
 	}
 
 	@Override
-	@Transactional
 	public ScheduleResponse immediatelyExecution(BatchJob batchJob) throws SchedulerException, ClassNotFoundException {
 		ScheduleResponse scheduleResponse = null;
 		
