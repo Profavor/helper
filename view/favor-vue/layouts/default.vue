@@ -26,25 +26,19 @@
   </div>
     <div style="width: 210px; float: left; height: 100%;">
       <div class="ui vertical menu">
-          <nuxt-link to="/helper/dashboard" class="item">
-            <div class="ui teal label">1</div>
-            Dashboard
-          </nuxt-link>
-          <nuxt-link to="/helper/project" class="item">
-            <div class="ui label">1</div>
-            Project
-          </nuxt-link>
-          <a class="item">
-            <div class="ui label">1</div>
-            Updates
-          </a>
-          <div class="item">
-            <div class="ui icon input">
-              <input type="text" placeholder="Search mail...">
-              <i class="search icon"></i>
-            </div>
-          </div>
-        </div>
+        <nuxt-link to="/helper/dashboard" class="item">
+          <div class="ui teal label">1</div>
+          Dashboard
+        </nuxt-link>
+        <nuxt-link to="/helper/project" class="item">
+          <div class="ui label">1</div>
+          Project
+        </nuxt-link>
+        <a class="item">
+          <div class="ui label">1</div>
+          Updates
+        </a>
+      </div>
     </div>
     <div style="margin-left: 215px; height: 100%;">
       <nuxt/>

@@ -12,7 +12,7 @@
                     <table class="ui table">
                         <colgroup>
                             <col width="100px">
-                            <col width="*">
+                            <col width="*"> 
                         </colgroup>
                         <thead>
                             <tr>
@@ -142,6 +142,8 @@
 import { FullCalendar } from 'vue-full-calendar'
 import 'fullcalendar/dist/fullcalendar.css'
 
+var thisTest = null;
+
 export default {
   components: {
       FullCalendar
@@ -169,7 +171,8 @@ export default {
                 left:   'title',
                 center: '',
                 right:  'today prev,next'
-            }
+            }, 
+            editable: false
         },
         events: [
             {
@@ -224,7 +227,42 @@ export default {
       },
 
       async getProjectShiftList(){
-          await this.$axios.get('/api/helper/getProjectShiftList?projectId='+this.projectId).then(res => this.projectShifts = res.data).catch(err=> this.$toast.error(err));
+          await this.$axios.get('/api/helper/getProjectShiftList?projectId='+this.projectId)
+            .then(res => {
+                
+                this.projectShifts = res.data
+                
+                // 하드코딩
+                this.projectShiftsTest = [
+                    {
+                        projectId : '40285beb6870cbf3016870d0c3fc0001'
+                        , id : '40285beb6875bca6016875c1df120001'
+                        , helpDate : '2019-01-16'
+                        , projectShiftHelpers : [
+                            {helperId : '김유현'}
+                            , {helperId : '조영민'}
+                        ]
+                    }
+                    , {
+                        projectId : '40285beb6870cbf3016870d0c3fc0001'
+                        , id : '40285beb6875bca6016875c1df120001'
+                        , helpDate : '2019-01-30'
+                        , projectShiftHelpers : [
+                            {helperId : '인치국'}
+                            , {helperId : '조영민'}
+                        ]
+                    }
+                ];
+                
+                this.events = [];
+                for(let i = 0; i < this.projectShiftsTest.length; i++){
+                    for(let j = 0; j < this.projectShiftsTest[i].projectShiftHelpers.length; j++){    
+                        this.events.push({title : this.projectShiftsTest[i].projectShiftHelpers[j].helperId , start : this.projectShiftsTest[i].helpDate});
+                    }
+                }
+
+            }).catch(err=> this.$toast.error(err));
+          
       },
 
       async addProjectShift(){
