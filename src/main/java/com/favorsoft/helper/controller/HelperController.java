@@ -43,12 +43,15 @@ public class HelperController {
 		return list;
 	}
 	
+	
 	@RequestMapping("/getProjectShiftList")
-	public List<ProjectShift> getProjectShiftList(@RequestParam String projectId){		
-		List<ProjectShift> list = helperService.getProjectShiftList(projectId, true);
+	public List<ProjectShift> getProjectShiftList(@RequestParam String projectId, @RequestParam String projectStatus){		
+		
+		List<ProjectShift> list = helperService.getProjectShiftList(projectId, projectStatus);
 		return list.stream().sorted(Comparator.comparing(ProjectShift::getHelpDate)).collect(Collectors.toList());
+		
 	}
-
+	
 	@RequestMapping("/project/list/dropdown")
 	public ResponseModel getProjectListDropdown(HttpServletRequest request){
 		

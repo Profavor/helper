@@ -26,6 +26,9 @@ import com.favorsoft.helper.service.impl.HelperServiceImpl;
 
 public class FrontierJob implements Job {
 
+	public final static String PROJECT_STATUS_OPEN = "OPEN";
+	public final static String PROJECT_STATUS_CLOSE = "CLOSE";	
+	
 	@Autowired
 	private HelperService helperService;
 
@@ -35,7 +38,7 @@ public class FrontierJob implements Job {
 		String projectId = (String) context.getMergedJobDataMap().get("projectId");
 
 		Project project = helperService.getProject(projectId).get();
-		List<ProjectShift> projectShiftList = helperService.getProjectShiftList(projectId, true);
+		List<ProjectShift> projectShiftList = helperService.getProjectShiftList(projectId, PROJECT_STATUS_OPEN);
 		List<Helper> addHelperList = new ArrayList<Helper>();
 		// Request Random
 		for (ProjectShift shift : projectShiftList) {
@@ -116,7 +119,7 @@ public class FrontierJob implements Job {
 
 		for (Helper helper : helperList) {
 			for (Project projects : allProject) {
-				List<ProjectShift> allShiftList = helperService.getProjectShiftList(projects.getId(), false);
+				List<ProjectShift> allShiftList = helperService.getProjectShiftList(projects.getId(), null);
 				for (ProjectShift shift : allShiftList) {
 					List<Helper> tempHelperList = shift.getHelpers();
 					for (Helper tempHelper : tempHelperList) {

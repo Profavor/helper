@@ -38,7 +38,7 @@ public interface HelperService {
 
 	public Project updateProject(Project oldProject, Project newProject);
 	
-	public List<ProjectShift> getProjectShiftList(String projectId, boolean isOpen);
+	public List<ProjectShift> getProjectShiftList(String projectId, String projectStatus);
 	
 	public List<ProjectShift> getProjectShiftBetweenHelpDate(Project project, Date startDate, Date endDate);
 	

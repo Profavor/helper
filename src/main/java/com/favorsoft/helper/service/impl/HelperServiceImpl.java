@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import com.favorsoft.helper.entity.Helper;
 import com.favorsoft.helper.entity.Project;
@@ -233,14 +234,15 @@ public class HelperServiceImpl implements HelperService{
 		projectRepository.save(project);		
 	}
 
+	
 	@Override
-	public List<ProjectShift> getProjectShiftList(String projectId, boolean isOpen) {
+	public List<ProjectShift> getProjectShiftList(String projectId, String projectStatus) {
 		Project project = getProject(projectId).get();
 		
-		if(isOpen) {
-			return projectShiftRepository.findByProjectAndStatus(project, PROJECT_STATUS_OPEN);
-		}else {
+		if(StringUtils.isEmpty(projectStatus)) {
 			return projectShiftRepository.findByProject(project);
+		}else {
+			return projectShiftRepository.findByProjectAndStatus(project, projectStatus);
 		}		
 	}
 

@@ -44,11 +44,11 @@
                             </tr>
                             <tr>
                                 <td>시작일</td>
-                                <td>{{new Date(project.startDate) |  dateFormat('YYYY-MM-DD')}}</td>
+                                <td>{{project.startDate}}</td>
                             </tr>
                             <tr>
                                 <td>종료일</td>
-                                <td>{{new Date(project.endDate) |  dateFormat('YYYY-MM-DD')}}</td>
+                                <td>{{project.endDate}}</td>
                             </tr>
                             <tr>
                                 <td>담당자</td>
@@ -60,7 +60,9 @@
                             </tr>
                         </tbody>
                     </table>
-                    <div class="ui tiny header">프론티어 지원 <button class="ui right floated mini basic button" style="margin-top: -5px;" @click="addProjectShift"><i class="icon user"></i>Shift 추가</button></div>
+                    <div class="ui tiny header">프론티어 지원 
+                        <button class="ui right floated mini basic button" style="margin-top: -5px;" @click="addProjectShift" v-if="projectId != '' && existAuth('ROLE_HELPER_USER')"><i class="icon user"></i>Shift 추가</button>
+                    </div>
                     <table class="ui table">
                         <colgroup>
                             <col width="100px">
@@ -142,8 +144,6 @@
 import { FullCalendar } from 'vue-full-calendar'
 import 'fullcalendar/dist/fullcalendar.css'
 
-var thisTest = null;
-
 export default {
   components: {
       FullCalendar
@@ -152,6 +152,7 @@ export default {
       this.usr = this.$auth.$state.user;
       this.getProjectDropdown();
 
+        console.log(this.usr)
   },
   data: function(){
       return {
@@ -187,14 +188,27 @@ export default {
     }
   },
   methods: {
-      existRequestHelper(request){
+    existRequestHelper(request){
           for(let i=0; i<request.length; i++){
               if(request[i].helper.knoxId == this.usr.loginId && request[i].status == 'HAND_UP'){
                   return true;
               }
           }
           return false;
-      },
+    },
+
+
+    existAuth(auth){
+        let returnValue = false;
+        for(let i = 0; i < this.usr.roles.length; i++){
+            if(this.usr.roles[i].authority == auth){
+                returnValue = true;
+                break;
+            }
+        }
+        return returnValue;
+    },
+
 
       requestCount(request){
           let count = 0;
@@ -226,38 +240,24 @@ export default {
         await this.$axios.get('/api/helper/getProject?id='+this.projectId).then(res => this.project = res.data).catch(err=> this.$toast.error(err));
       },
 
-      async getProjectShiftList(){
-          await this.$axios.get('/api/helper/getProjectShiftList?projectId='+this.projectId)
+      async getProjectShiftListOpen(){
+          let that = this;
+          await this.$axios.get('/api/helper/getProjectShiftList?projectId='+this.projectId+'&projectStatus=OPEN')
+            .then(res => {
+                that.projectShifts = res.data
+            }).catch(err=> this.$toast.error(err));
+          
+      },
+
+      async getProjectShiftListClose(){
+          let that = this;
+          await this.$axios.get('/api/helper/getProjectShiftList?projectId='+this.projectId+'&projectStatus=CLOSE')
             .then(res => {
                 
-                this.projectShifts = res.data
-                
-                // 하드코딩
-                this.projectShiftsTest = [
-                    {
-                        projectId : '40285beb6870cbf3016870d0c3fc0001'
-                        , id : '40285beb6875bca6016875c1df120001'
-                        , helpDate : '2019-01-16'
-                        , projectShiftHelpers : [
-                            {helperId : '김유현'}
-                            , {helperId : '조영민'}
-                        ]
-                    }
-                    , {
-                        projectId : '40285beb6870cbf3016870d0c3fc0001'
-                        , id : '40285beb6875bca6016875c1df120001'
-                        , helpDate : '2019-01-30'
-                        , projectShiftHelpers : [
-                            {helperId : '인치국'}
-                            , {helperId : '조영민'}
-                        ]
-                    }
-                ];
-                
-                this.events = [];
-                for(let i = 0; i < this.projectShiftsTest.length; i++){
-                    for(let j = 0; j < this.projectShiftsTest[i].projectShiftHelpers.length; j++){    
-                        this.events.push({title : this.projectShiftsTest[i].projectShiftHelpers[j].helperId , start : this.projectShiftsTest[i].helpDate});
+                that.events = [];
+                for(let i = 0; i < res.data.length; i++){
+                    for(let j = 0; j < res.data[i].helpers.length; j++){    
+                        that.events.push({title : res.data[i].helpers[j].userName , start : res.data[i].helpDate});
                     }
                 }
 
@@ -315,7 +315,8 @@ export default {
 
       refresh(){
           this.getProject();
-          this.getProjectShiftList();
+          this.getProjectShiftListOpen(); // 프론티어 지원 영역
+          this.getProjectShiftListClose(); // 확정 헬퍼 캐린더 표시
       },
 
       isHelperAdminRole(){
