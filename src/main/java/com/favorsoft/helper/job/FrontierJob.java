@@ -16,6 +16,8 @@ import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
 
 import com.favorsoft.helper.entity.Helper;
 import com.favorsoft.helper.entity.Project;
@@ -32,6 +34,9 @@ public class FrontierJob implements Job {
 	@Autowired
 	private HelperService helperService;
 
+	@Autowired
+    public JavaMailSender javaMailSender;
+	
 	@Override
 	@Transactional
 	public void execute(JobExecutionContext context) throws JobExecutionException {
@@ -66,6 +71,13 @@ public class FrontierJob implements Job {
 						shift.getHelpers().add(req.getHelper());
 						addHelperList.add(req.getHelper());
 						shiftRequestList.remove(random);
+					
+						String to = req.getHelper().getKnoxId() + "@miracom.co.kr";
+						String subject = "[TEST][Helper] 봉사 안내 메일";
+						String text = "봉사가세요!";
+						
+						sendSimpleMessage(to, subject, text);
+						
 					}
 
 					if (shift.getHelpers().size() == project.getMaxHelperCount()) {
@@ -108,7 +120,23 @@ public class FrontierJob implements Job {
 				helperService.saveProjectShift(shift);
 			}
 		}
+		
+		
+		String to = "ehli@nate.com";
+		String subject = "[TEST][Helper] 봉사 안내 메일";
+		String text = "봉사가세요!";
+		
+		sendSimpleMessage(to, subject, text);
+		
 	}
+
+    public void sendSimpleMessage(String to, String subject, String text) {
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setTo(to);
+        message.setSubject(subject);
+        message.setText(text);
+        javaMailSender.send(message);
+    }
 
 	private List<Helper> setHelperCount(Project project) {
 		List<Helper> helperList = project.getHelpers();
@@ -157,8 +185,8 @@ public class FrontierJob implements Job {
 		List<Project> projectList = helperService.getProjectList(false);
 
 		for (Project project : projectList) {
-			List<ProjectShift> projectShiftList = helperService.getProjectShiftBetweenHelpDate(project, startDate,
-					endDate);
+			
+			List<ProjectShift> projectShiftList = helperService.getProjectShiftBetweenHelpDate(project, startDate, endDate);
 
 			for (ProjectShift shift : projectShiftList) {
 				List<Helper> helperList = shift.getHelpers();
