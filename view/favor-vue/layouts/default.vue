@@ -34,10 +34,10 @@
           <div class="ui label">1</div>
           Project
         </nuxt-link>
-        <a class="item">
+        <nuxt-link to="/helper/myhelper" class="item">
           <div class="ui label">1</div>
-          Updates
-        </a>
+          나의 봉사
+         </nuxt-link>
       </div>
     </div>
     <div style="margin-left: 215px; height: 100%;">

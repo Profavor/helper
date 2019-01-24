@@ -23,10 +23,12 @@ module.exports = {
       { hid: 'description', name: 'description', content: pkg.description }
     ],
     link: [
-      { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }
+      { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' },
+      { rel: 'stylesheet', href: 'https://cdnjs.cloudflare.com/ajax/libs/izimodal/1.5.1/css/iziModal.min.css' }
     ],
     script: [
       {src: 'https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js'},
+      {src: 'https://cdnjs.cloudflare.com/ajax/libs/izimodal/1.5.1/js/iziModal.min.js'},
       {src: '/semantic-ui/semantic.min.js'},
       {src: '/js/calendar.min.js'},
       {src: '/js/polyfill.min.js'},
