@@ -115,6 +115,10 @@
                         <label>추첨일(Cron Expression)</label>
                         <input type="text" name="triggerValue" placeholder="추첨일(Cron Expression)" v-model="project.triggerValue">
                     </div>
+                    <div class="field">
+                        <label>교육 동영상 URL</label>
+                        <input type="text" name="educationUrl" placeholder="교육동영상 URL" v-model="project.educationUrl">
+                    </div>
                     <div class="ui error message">
 
                     </div>
@@ -216,7 +220,8 @@ export default {
                 status: 'OPEN',
                 maxHelperCount: '',
                 owner: '',
-                triggerValue: ''   
+                triggerValue: '',
+                educationUrl: ''
             },
             selectedProjectId: '',
             projectHelpers: [],
@@ -299,6 +304,7 @@ export default {
         },
 
         createProjectModal(){
+            this.initProject();
             var that = this;
             $('#projectRegist').modal('show');
 
@@ -313,6 +319,7 @@ export default {
                     return year + '-' + pad(month, 2) + '-' + pad(day, 2);
                     }
             }});
+            
             $('#endDate').calendar({ type: 'date', startCalendar: $('#startDate') ,
                 formatter: {
                     date: function (date, settings) {
@@ -368,7 +375,8 @@ export default {
                     that.project.status = res.data.status;
                     that.project.maxHelperCount = res.data.maxHelperCount;
                     that.project.owner = res.data.owner;
-                    that.project.triggerValue = res.data.triggerValue; 
+                    that.project.triggerValue = res.data.triggerValue;
+                    that.project.educationUrl = res.data.educationUrl;
                 }
             }).catch(err=> this.$toast.error(err));
         },
@@ -400,15 +408,16 @@ export default {
         },
 
         initProject(){
-            that.project.id = '';
-            that.project.projectName = '';
-            that.project.description = '';
-            that.project.startDate = '';
-            that.project.endDate =  '';
-            that.project.status = '';
-            that.project.maxHelperCount = '';
-            that.project.owner = '';
-            that.project.triggerValue = ''; 
+            this.project.id = '';
+            this.project.projectName = '';
+            this.project.description = '';
+            this.project.startDate = '';
+            this.project.endDate =  '';
+            this.project.status = '';
+            this.project.maxHelperCount = '';
+            this.project.owner = '';
+            this.project.triggerValue = '';
+            this.project.educationUrl = '';
         },
 
         initHelper(){

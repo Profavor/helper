@@ -100,6 +100,7 @@ public class HelperServiceImpl implements HelperService{
 				
 				quartzService.register(batchJob);
 			}
+			projectRepository.save(project);
 		}		
 	}
 	
@@ -261,5 +262,10 @@ public class HelperServiceImpl implements HelperService{
 	@Override
 	public List<ProjectShift> getProjectShiftBetweenHelpDate(Project project, Date startDate, Date endDate) {
 		return projectShiftRepository.findByProjectAndHelpDateBetween(project, startDate, endDate);
+	}
+
+	@Override
+	public List<ProjectShift> getProjectShiftListByKnoxId(String knoxId) {		
+		return projectShiftRepository.findByHelpers_knoxId(knoxId);
 	}
 }

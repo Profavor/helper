@@ -54,6 +54,8 @@ public class Project extends BaseEntity{
 	
 	private String triggerValue;
 	
+	private String educationUrl;
+	
 	@LazyCollection(LazyCollectionOption.FALSE)
 	@ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
 	@JoinTable(name = "project_helpers",
@@ -142,6 +144,11 @@ public class Project extends BaseEntity{
 		this.helpers = helpers;
 	}
 
-	
-	
+	public String getEducationUrl() {
+		return educationUrl;
+	}
+
+	public void setEducationUrl(String educationUrl) {
+		this.educationUrl = educationUrl;
+	}	
 }

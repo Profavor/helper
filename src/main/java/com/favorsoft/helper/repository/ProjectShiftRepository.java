@@ -20,5 +20,7 @@ public interface ProjectShiftRepository extends JpaRepository<ProjectShift, Stri
 	ProjectShift findByProjectAndHelpDate(Project project, Date helpDate);
 	
 	List<ProjectShift> findByProjectAndHelpDateBetween(Project project, Date startDate, Date endDate);
+	
+	List<ProjectShift> findByHelpers_knoxId(String knoxId);
 
 }

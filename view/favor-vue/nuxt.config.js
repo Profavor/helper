@@ -105,8 +105,8 @@ module.exports = {
 
   proxy: {
     // Simple proxy
-    '/api': 'http://helper-api-server:8001',
-    '/auth': 'http://helper-api-server:8001'
+    '/api': 'http://localhost:8080',
+    '/auth': 'http://localhost:8080'
   },
 
   /*

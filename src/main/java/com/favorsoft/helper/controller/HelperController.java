@@ -52,6 +52,12 @@ public class HelperController {
 		
 	}
 	
+	@RequestMapping("/getProjectShiftListByKnoxId")
+	public List<ProjectShift> getProjectShiftListByKnoxId(@RequestParam String knoxId){	
+		List<ProjectShift> list = helperService.getProjectShiftListByKnoxId(knoxId);
+		return list.stream().sorted(Comparator.comparing(ProjectShift::getHelpDate).reversed()).collect(Collectors.toList());		
+	}
+	
 	@RequestMapping("/project/list/dropdown")
 	public ResponseModel getProjectListDropdown(HttpServletRequest request){
 		

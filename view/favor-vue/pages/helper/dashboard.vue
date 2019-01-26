@@ -151,8 +151,6 @@ export default {
   created: function(){
       this.usr = this.$auth.$state.user;
       this.getProjectDropdown();
-
-        console.log(this.usr)
   },
   data: function(){
       return {

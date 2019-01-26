@@ -47,4 +47,6 @@ public interface HelperService {
 	public void handupHelper(ProjectShift projectShift) throws Exception;
 
 	public void handdownHelper(ProjectShift projectShift) throws Exception;
+	
+	public List<ProjectShift> getProjectShiftListByKnoxId(String knoxId);
 }
