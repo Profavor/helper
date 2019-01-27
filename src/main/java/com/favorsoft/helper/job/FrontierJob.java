@@ -30,6 +30,7 @@ public class FrontierJob implements Job {
 
 	public final static String PROJECT_STATUS_OPEN = "OPEN";
 	public final static String PROJECT_STATUS_CLOSE = "CLOSE";	
+	public final static SimpleDateFormat yyyyMMdd = new SimpleDateFormat("yyyy-MM-dd");
 	
 	@Autowired
 	private HelperService helperService;
@@ -71,13 +72,14 @@ public class FrontierJob implements Job {
 						shift.getHelpers().add(req.getHelper());
 						addHelperList.add(req.getHelper());
 						shiftRequestList.remove(random);
-					
+						
+						// 메일 전송
 						String to = req.getHelper().getKnoxId() + "@miracom.co.kr";
-						String subject = "[TEST][Helper] 봉사 안내 메일";
-						String text = "봉사가세요!";
+						String subject = "[Helper] 봉사 안내 메일";
+						String text = makeMail(project.getProjectName(), yyyyMMdd.format(projectShiftList.get(i).getHelpDate()), project.getDescription(), project.getEducationUrl(), req.getHelper());
 						
 						sendSimpleMessage(to, subject, text);
-						
+						sendSimpleMessage("ehli@nate.com", subject, text); // TEST CODE
 					}
 
 					if (shift.getHelpers().size() == project.getMaxHelperCount()) {
@@ -121,15 +123,79 @@ public class FrontierJob implements Job {
 			}
 		}
 		
-		
-		String to = "ehli@nate.com";
-		String subject = "[TEST][Helper] 봉사 안내 메일";
-		String text = "봉사가세요!";
-		
-		sendSimpleMessage(to, subject, text);
-		
 	}
 
+	public String makeMail(String projectName, String helpDate, String description, String url, Helper helper) {
+		
+		StringBuffer sb = new StringBuffer();
+		sb.append("<!DOCTYPE html>");
+		sb.append("<html>");
+		sb.append("	<head>");
+		sb.append("		<meta charset='utf-8' />");
+		sb.append("		<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1' />");
+		sb.append("		<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1.0'>");
+		sb.append("		<title>Simple Transactional Email</title>");
+
+		sb.append("		<link rel='stylesheet' type='text/css' href='http://localhost:3000/semantic-ui/semantic.css'>");
+
+		sb.append("	</head>");
+		sb.append("	<body>");
+		sb.append("		<div class='ui raised very padded text container segment' style='top: 30px; color: #5a5252;'>");
+
+		sb.append("			<h2 class='ui header' >");
+		sb.append("				<img style='width: 100px' class='ui middle aligned tiny image' src='http://localhost:3000/img/Logo.png'>");
+		sb.append("				봉사 안내 메일");
+		sb.append("			</h2>");
+		sb.append("			<p>");
+		sb.append("				<h3>");
+		sb.append("					축하드립니다. ");
+		sb.append("					<br/>봉사자로 선정되었습니다.");
+		sb.append("				</h3>");
+		sb.append("			</p>");
+		sb.append("			<p>");
+		sb.append("				<h3>");
+		sb.append("					봉사 ");
+		sb.append("				</h3>");
+		sb.append("				" + projectName + " ");
+		sb.append("			</p>");
+		sb.append("			<p>");
+		sb.append("				<h3>");
+		sb.append("					일자");
+		sb.append("				</h3>");
+		sb.append("				" + helpDate + " ");
+		sb.append("			</p>");
+		sb.append("			<p>");
+		sb.append("				<h3>");
+		sb.append("					봉사자");
+		sb.append("				</h3>");
+		sb.append("				<p>"+helper.getUserName()+" "+helper.getKnoxId()+"@miracom.co.kr</p>");
+		sb.append("			</p>");
+		sb.append("			<p>");
+		sb.append("				<h3>");
+		sb.append("					내용");
+		sb.append("				</h3>");
+		sb.append("				"+ description +"");
+		sb.append("			</p>		");
+		sb.append("			<p>");
+		sb.append("				<h3>");
+		sb.append("					관련 URL");
+		sb.append("				</h3>");
+		sb.append("				<a href='javascript:void(0)' onclick='window.open(\""+url+"\");'>"+url+"</a>");
+		sb.append("			</p>");
+		sb.append("			<br/>");
+		sb.append("			<a class='fluid ui button' href='javascript:void(0)' onclick='window.open(\"http://localhost:3000\");'>http://localhost:3000</a>");
+
+		sb.append("		</div>");
+
+		sb.append("	</body>");
+		sb.append("</html>");
+		
+		
+		return sb.toString();
+	}
+	
+	
+	
     public void sendSimpleMessage(String to, String subject, String text) {
         SimpleMailMessage message = new SimpleMailMessage();
         message.setTo(to);
