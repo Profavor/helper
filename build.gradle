@@ -21,7 +21,7 @@ apply plugin: 'io.spring.dependency-management'
 apply plugin: 'com.palantir.docker'
 
 group = 'profavor'
-version = '1.1'
+version = '1.0'
 sourceCompatibility = 1.8
 
 jar {
