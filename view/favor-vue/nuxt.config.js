@@ -105,8 +105,8 @@ module.exports = {
 
   proxy: {
     // Simple proxy
-    '/api': 'http://localhost:8080',
-    '/auth': 'http://localhost:8080'
+    '/api': 'http://m-scheduler-server:8001',
+    '/auth': 'http://m-scheduler-server:8001'
   },
 
   /*
