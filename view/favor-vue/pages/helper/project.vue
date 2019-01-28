@@ -413,7 +413,7 @@ export default {
             this.project.description = '';
             this.project.startDate = '';
             this.project.endDate =  '';
-            this.project.status = '';
+            this.project.status = 'OPEN';
             this.project.maxHelperCount = '';
             this.project.owner = '';
             this.project.triggerValue = '';
