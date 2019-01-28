@@ -10,6 +10,8 @@ import java.util.List;
 import java.util.Random;
 import java.util.stream.Collectors;
 
+import javax.mail.MessagingException;
+import javax.mail.internet.MimeMessage;
 import javax.transaction.Transactional;
 
 import org.quartz.Job;
@@ -18,6 +20,7 @@ import org.quartz.JobExecutionException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
 
 import com.favorsoft.helper.entity.Helper;
 import com.favorsoft.helper.entity.Project;
@@ -73,13 +76,32 @@ public class FrontierJob implements Job {
 						addHelperList.add(req.getHelper());
 						shiftRequestList.remove(random);
 						
-						// 메일 전송
-						String to = req.getHelper().getKnoxId() + "@miracom.co.kr";
-						String subject = "[Helper] 봉사 안내 메일";
-						String text = makeMail(project.getProjectName(), yyyyMMdd.format(projectShiftList.get(i).getHelpDate()), project.getDescription(), project.getEducationUrl(), req.getHelper());
 						
-						sendSimpleMessage(to, subject, text);
-						sendSimpleMessage("ehli@nate.com", subject, text); // TEST CODE
+						
+						/*
+						
+						
+						MimeMessage message = javaMailSender.createMimeMessage();
+						
+						try {
+						
+							MimeMessageHelper messageHelper = new MimeMessageHelper(message, true, "UTF-8");
+							messageHelper.setSubject("[Helper] 봉사 안내 메일");
+							String htmlContent = makeMail(project.getProjectName(), yyyyMMdd.format(projectShiftList.get(i).getHelpDate()), project.getDescription(), project.getEducationUrl(), req.getHelper());
+							messageHelper.setText(htmlContent, true);
+							messageHelper.setTo(req.getHelper().getKnoxId() + "@miracom.co.kr");
+							javaMailSender.send(message);
+							
+						} catch (MailException e) {
+							e.printStackTrace();
+							return;
+						} catch (Throwable e) {
+							e.printStackTrace();
+							return;
+						}
+						
+						*/
+						
 					}
 
 					if (shift.getHelpers().size() == project.getMaxHelperCount()) {
@@ -123,9 +145,72 @@ public class FrontierJob implements Job {
 			}
 		}
 		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
+		Calendar cal = Calendar.getInstance();
+		cal.add(Calendar.MONTH, +1);
+		cal.set(Calendar.DAY_OF_MONTH, cal.getActualMinimum(Calendar.DAY_OF_MONTH));
+		Date startDate = cal.getTime();
+		String strStartDate = formatter.format(startDate);
+		cal.set(Calendar.DAY_OF_MONTH, cal.getActualMaximum(Calendar.DAY_OF_MONTH));
+		Date endDate = cal.getTime();
+		String strEndDate = formatter.format(endDate);
+		try {
+			startDate = formatter.parse(strStartDate.substring(0, 10) + " 00:00:00");
+			endDate = formatter.parse(strEndDate.substring(0, 10) + " 23:59:59");
+		} catch (ParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		// 전체 프로젝트 리스트를 불러온다 (종료된 프로젝트 포함)
+		List<Project> projectList = helperService.getProjectList(false);
+
+		for (Project p : projectList) {
+			
+			List<ProjectShift> sList = helperService.getProjectShiftBetweenHelpDate(p, startDate, endDate);
+
+			for (ProjectShift shift : sList) {
+				List<Helper> helperList = shift.getHelpers();
+				for (Helper helper : helperList) {
+					
+					MimeMessage message = javaMailSender.createMimeMessage();
+					
+			        try {
+			            MimeMessageHelper messageHelper = new MimeMessageHelper(message, true, "UTF-8");
+			            messageHelper.setSubject("봉사 안내 메일");
+			            messageHelper.setTo(helper.getKnoxId() + "@miracom.com");
+			            messageHelper.setFrom("labs.prusoft@gmail.com");
+			            messageHelper.setText(makeMail(p.getProjectName(), yyyyMMdd.format(shift.getHelpDate()), p.getDescription(), p.getEducationUrl(), helperList), true);
+			            // message.setContent(makeMail(p.getProjectName(), yyyyMMdd.format(shift.getHelpDate()), p.getDescription(), p.getEducationUrl(), helperList),"text/html");
+			            javaMailSender.send(message);
+			            
+			 
+			        } catch (MessagingException e) {
+			            e.printStackTrace();
+			        }
+					
+				}
+			}
+		}
+		
 	}
 
-	public String makeMail(String projectName, String helpDate, String description, String url, Helper helper) {
+	public String makeMail(String projectName, String helpDate, String description, String url, List<Helper> helperList) {
 		
 		StringBuffer sb = new StringBuffer();
 		sb.append("<!DOCTYPE html>");
@@ -136,14 +221,14 @@ public class FrontierJob implements Job {
 		sb.append("		<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1.0'>");
 		sb.append("		<title>Simple Transactional Email</title>");
 
-		sb.append("		<link rel='stylesheet' type='text/css' href='http://localhost:3000/semantic-ui/semantic.css'>");
+		// sb.append("		<link rel='stylesheet' type='text/css' href='https://labs.prusoft.space/semantic-ui/semantic.css'>");
 
 		sb.append("	</head>");
 		sb.append("	<body>");
 		sb.append("		<div class='ui raised very padded text container segment' style='top: 30px; color: #5a5252;'>");
 
 		sb.append("			<h2 class='ui header' >");
-		sb.append("				<img style='width: 100px' class='ui middle aligned tiny image' src='http://localhost:3000/img/Logo.png'>");
+		// sb.append("				<img style='width: 100px' class='ui middle aligned tiny image' src='https://labs.prusoft.space/img/Logo.png'>");
 		sb.append("				봉사 안내 메일");
 		sb.append("			</h2>");
 		sb.append("			<p>");
@@ -168,7 +253,11 @@ public class FrontierJob implements Job {
 		sb.append("				<h3>");
 		sb.append("					봉사자");
 		sb.append("				</h3>");
-		sb.append("				<p>"+helper.getUserName()+" "+helper.getKnoxId()+"@miracom.co.kr</p>");
+		
+		for (Helper helper : helperList) {
+			sb.append("				<p>"+helper.getUserName()+" "+helper.getKnoxId()+"@miracom.co.kr</p>");
+		}
+		
 		sb.append("			</p>");
 		sb.append("			<p>");
 		sb.append("				<h3>");
@@ -183,13 +272,12 @@ public class FrontierJob implements Job {
 		sb.append("				<a href='javascript:void(0)' onclick='window.open(\""+url+"\");'>"+url+"</a>");
 		sb.append("			</p>");
 		sb.append("			<br/>");
-		sb.append("			<a class='fluid ui button' href='javascript:void(0)' onclick='window.open(\"http://localhost:3000\");'>http://localhost:3000</a>");
+		sb.append("			<a class='fluid ui button' href='javascript:void(0)' onclick='window.open(\"https://labs.prusoft.space\");'>https://labs.prusoft.space</a>");
 
 		sb.append("		</div>");
 
 		sb.append("	</body>");
 		sb.append("</html>");
-		
 		
 		return sb.toString();
 	}
