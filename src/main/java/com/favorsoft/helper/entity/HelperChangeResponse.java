@@ -15,6 +15,7 @@ import javax.persistence.UniqueConstraint;
 
 import org.hibernate.annotations.GenericGenerator;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.favorsoft.shared.entity.BaseEntity;
 
@@ -33,6 +34,7 @@ public class HelperChangeResponse extends BaseEntity implements Serializable {
     @Column(name = "id", length = 128)
 	private String id;
 
+	@JsonBackReference("helperChangeResponses")
 	@ManyToOne(cascade = CascadeType.ALL, targetEntity=Helper.class)
     @JoinColumn(name="helper_id", referencedColumnName = "id", nullable=false)
 	private Helper helper;
