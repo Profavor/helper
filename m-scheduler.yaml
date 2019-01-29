@@ -13,57 +13,57 @@ spec:
       labels:
         app: m-scheduler
         tier: compute
-    spec:  
+    spec:
       hostname: m-scheduler
       subdomain: favorsoft
       dnsPolicy: ClusterFirst
       containers:
-        - image: profavor/m-scheduler:1.0
-          imagePullPolicy: Always
-          name: m-scheduler
-          env: 
-            - name: DB_HOST
-              valueFrom:
-                secretKeyRef:
-                  name: m-scheduler-secret
-                  key: db-host
-            - name: DB_PORT
-              valueFrom:
-                secretKeyRef:
-                  name: m-scheduler-secret
-                  key: db-port
-            - name: DB_SCHEMA
-              valueFrom:
-                secretKeyRef:
-                  name: m-scheduler-secret
-                  key: db-schema
-            - name: DB_USERNAME
-              valueFrom:
-                secretKeyRef:
-                  name: m-scheduler-secret
-                  key: db-username
-            - name: DB_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: m-scheduler-secret
-                  key: db-password
-            - name: DB_CLASSNAME
-              value: com.mysql.cj.jdbc.Driver
-            - name: MAIL_HOST
-              value: 64.233.189.109
-            - name: MAIL_PORT
-              value: "587"
-            - name: MAIL_USERNAME
-              valueFrom:
-                secretKeyRef:
-                  name: m-scheduler-secret
-                  key: mail-username
-            - name: MAIL_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: m-scheduler-secret
-                  key: mail-password
-            - name: SERVER_PORT
-              value: "8001"
-          ports:
-            - containerPort: 8001
+      - image: profavor/m-scheduler:1.0
+        imagePullPolicy: Always
+        name: m-scheduler
+        env:
+        - name: DB_HOST
+          valueFrom:
+            secretKeyRef:
+              name: m-scheduler-secret
+              key: db-host
+        - name: DB_PORT
+          valueFrom:
+            secretKeyRef:
+              name: m-scheduler-secret
+              key: db-port
+        - name: DB_SCHEMA
+          valueFrom:
+            secretKeyRef:
+              name: m-scheduler-secret
+              key: db-schema
+        - name: DB_USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: m-scheduler-secret
+              key: db-username
+        - name: DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: m-scheduler-secret
+              key: db-password
+        - name: DB_CLASSNAME
+          value: com.mysql.cj.jdbc.Driver
+        - name: MAIL_HOST
+          value: 64.233.189.109
+        - name: MAIL_PORT
+          value: '587'
+        - name: MAIL_USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: m-scheduler-secret
+              key: mail-username
+        - name: MAIL_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: m-scheduler-secret
+              key: mail-password
+        - name: SERVER_PORT
+          value: '8001'
+        ports:
+        - containerPort: 8001
