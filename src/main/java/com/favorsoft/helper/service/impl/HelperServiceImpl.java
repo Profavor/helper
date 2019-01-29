@@ -96,11 +96,12 @@ public class HelperServiceImpl implements HelperService{
 			if(!tempProject.get().getTriggerValue().equals(project.getTriggerValue())) {
 				BatchJob batchJob = batchJobService.getBatchJob(project.getId(), "HELPER");
 				List<BatchJobTrigger> batchJobTriggers = batchJob.getBatchJobTriggers();
-				batchJobTriggers.get(0).setTriggerValue(project.getTriggerValue());
+				batchJobTriggers.get(0).setTriggerValue(project.getTriggerValue());			
 				
 				quartzService.register(batchJob);
-			}
-			projectRepository.save(project);
+			}	
+			project = updateProject(tempProject.get(), project);
+			System.out.println(project.toString());
 		}		
 	}
 	
@@ -205,12 +206,15 @@ public class HelperServiceImpl implements HelperService{
 
 	@Override
 	public Project updateProject(Project oldProject, Project newProject) {
-		oldProject.setHelpers(newProject.getHelpers());
+		// oldProject.setHelpers(newProject.getHelpers());
 		oldProject.setDescription(newProject.getDescription());
 		oldProject.setEndDate(newProject.getEndDate());
 		oldProject.setStartDate(newProject.getStartDate());
 		oldProject.setProjectName(newProject.getProjectName());
-		oldProject.setStatus(newProject.getStatus());		
+		oldProject.setStatus(newProject.getStatus());
+		oldProject.setTriggerValue(newProject.getTriggerValue());
+		oldProject.setOwner(newProject.getOwner());
+		oldProject.setEducationUrl(newProject.getEducationUrl());
 		return projectRepository.saveAndFlush(oldProject);
 	}
 	
