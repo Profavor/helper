@@ -37,7 +37,7 @@ spec:
             secretKeyRef:
               name: m-scheduler-secret
               key: db-schema
-        - name: DB_USERNAME
+        - name: DB_USERNAME  
           valueFrom:
             secretKeyRef:
               name: m-scheduler-secret

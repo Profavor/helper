@@ -13,7 +13,7 @@ spec:
       labels:
         app: mariadb
     spec:
-      containers:
+      containers:   
       - image: mariadb
         name: mariadb
         env:
