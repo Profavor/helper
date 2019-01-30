@@ -13,10 +13,10 @@ spec:
       labels:
         app: helper
         tier: compute
-    spec:  
+    spec:
       containers:
-        - image: profavor/helper:1.0
-          imagePullPolicy: Always
-          name: helper
-          ports:
-            - containerPort: 3000
+      - image: profavor/helper:1.0
+        imagePullPolicy: Always
+        name: helper
+        ports:
+        - containerPort: 3000    

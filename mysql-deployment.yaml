@@ -1,4 +1,4 @@
-apiVersion: apps/v1 # for versions before 1.9.0 use apps/v1beta2
+apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: mariadb
@@ -13,16 +13,16 @@ spec:
       labels:
         app: mariadb
     spec:
-      containers:
+      containers:   
       - image: mariadb
         name: mariadb
         env:
           # Use secret in real usage
         - name: MYSQL_ROOT_PASSWORD
           valueFrom:
-                secretKeyRef:
-                  name: m-scheduler-secret
-                  key: db-password
+            secretKeyRef:
+              name: m-scheduler-secret
+              key: db-password
         ports:
         - containerPort: 3306
           name: mariadb
@@ -33,8 +33,6 @@ spec:
       - name: mysql-persistent-storage
         persistentVolumeClaim:
           claimName: mysql-pv-claim
-          
----
 apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
@@ -42,13 +40,13 @@ metadata:
   labels:
     app: mariadb
   annotations:
-    kubernetes.io/ingress.class: "nginx"
+    kubernetes.io/ingress.class: nginx
 spec:
   rules:
-    - host: mysql.labs.prusoft.space
-      http:
-        paths:
-          - path: /
-            backend:
-              serviceName: mysql
-              servicePort: 3306
+  - host: mysql.labs.prusoft.space
+    http:
+      paths:
+      - path: /
+        backend:
+          serviceName: mysql
+          servicePort: 3306
