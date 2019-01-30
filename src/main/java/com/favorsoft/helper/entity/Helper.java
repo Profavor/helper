@@ -8,13 +8,9 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Transient;
-import javax.persistence.UniqueConstraint;
 
 import org.hibernate.annotations.LazyCollection;
 import org.hibernate.annotations.LazyCollectionOption;
@@ -117,4 +113,17 @@ public class Helper extends BaseEntity{
 	public void setHelpCount(int helpCount) {
 		this.helpCount = helpCount;
 	}
+	public List<HelperChangeRequest> getHelperChangeRequests() {
+		return helperChangeRequests;
+	}
+	public void setHelperChangeRequests(List<HelperChangeRequest> helperChangeRequests) {
+		this.helperChangeRequests = helperChangeRequests;
+	}
+	public List<HelperChangeResponse> getHelperChangeResponses() {
+		return helperChangeResponses;
+	}
+	public void setHelperChangeResponses(List<HelperChangeResponse> helperChangeResponses) {
+		this.helperChangeResponses = helperChangeResponses;
+	}
+	
 }

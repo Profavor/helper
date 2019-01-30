@@ -16,6 +16,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import com.favorsoft.helper.entity.Helper;
+import com.favorsoft.helper.entity.HelperChangeRequest;
+import com.favorsoft.helper.entity.HelperChangeResponse;
 import com.favorsoft.helper.entity.Project;
 import com.favorsoft.helper.entity.ProjectShift;
 import com.favorsoft.helper.entity.ShiftHelperRequest;
@@ -30,13 +32,16 @@ import com.favorsoft.schedule.entity.BatchJobTrigger;
 import com.favorsoft.schedule.service.BatchJobService;
 import com.favorsoft.schedule.service.QuartzService;
 
-@Transactional
+@Transactional(rollbackOn = Exception.class)
 @Service
 public class HelperServiceImpl implements HelperService{
 	public final static String PROJECT_STATUS_OPEN = "OPEN";
 	public final static String PROJECT_STATUS_CLOSE = "CLOSE";
 	public final static String REQUEST_STATUS_HANDUP = "HAND_UP";
 	public final static String REQUEST_STATUS_HANDDOWN = "HAND_DOWN";
+	public final static String HELPER_STATUS_REQUEST = "REQUEST";
+	public final static String HELPER_STATUS_ACCEPT = "ACCEPT";
+	public final static String HELPER_STATUS_DENY = "DENY";
 	
 	@Autowired
 	private HelperRepository helperRepository;
@@ -271,5 +276,35 @@ public class HelperServiceImpl implements HelperService{
 	@Override
 	public List<ProjectShift> getProjectShiftListByKnoxId(String knoxId) {		
 		return projectShiftRepository.findByHelpers_knoxId(knoxId);
+	}
+
+	@Override
+	public void changeRequest(HelperChangeRequest helperChangeRequest) {
+		Project project = getProject(helperChangeRequest.getProjectShift().getProjectId()).get();
+		Date helpDate = helperChangeRequest.getProjectShift().getHelpDate();		
+		ProjectShift projectShift = getProjectShift(project, helpDate);
+		
+		Helper requestHelper = getHelper(helperChangeRequest.getHelper().getKnoxId());
+		Helper responseHelper = getHelper(helperChangeRequest.getChangeHelper().getKnoxId());
+		
+		List<HelperChangeRequest> reqList = requestHelper.getHelperChangeRequests();
+		helperChangeRequest.setHelper(requestHelper);
+		helperChangeRequest.setRequestDate(new Date());
+		helperChangeRequest.setProjectShift(projectShift);
+		helperChangeRequest.setChangeHelper(responseHelper);
+		helperChangeRequest.setStatus(HELPER_STATUS_REQUEST);
+		reqList.add(helperChangeRequest);
+		
+		List<HelperChangeResponse> resList = responseHelper.getHelperChangeResponses();
+		HelperChangeResponse helperChangeResponse = new HelperChangeResponse();
+		helperChangeResponse.setHelper(responseHelper);				
+		helperChangeResponse.setProjectShift(projectShift);
+		helperChangeResponse.setResponseDate(new Date());
+		helperChangeResponse.setChangeHelper(requestHelper);
+		helperChangeResponse.setStatus(HELPER_STATUS_REQUEST);
+		resList.add(helperChangeResponse);
+		
+		helperRepository.save(requestHelper);
+		helperRepository.save(responseHelper);
 	}
 }

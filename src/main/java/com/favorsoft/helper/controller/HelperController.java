@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.favorsoft.helper.entity.Helper;
+import com.favorsoft.helper.entity.HelperChangeRequest;
 import com.favorsoft.helper.entity.Project;
 import com.favorsoft.helper.entity.ProjectShift;
 import com.favorsoft.helper.service.HelperService;
@@ -245,5 +246,22 @@ public class HelperController {
 	public Helper getHelper(@RequestParam("knoxId") String knoxId){
 		Helper helper = helperService.getHelper(knoxId);
 		return helper;
+	}
+	
+	@RequestMapping(value="/changeRequest", method=RequestMethod.POST)
+	public ResponseModel deleteProjectHelper( @RequestBody HelperChangeRequest helperChangeRequest) {
+		Authentication auth =  SecurityContextHolder.getContext().getAuthentication();
+		helperChangeRequest.setHelper(helperService.getHelper(auth.getName()));
+		
+		ResponseModel res = new ResponseModel();		
+		try {
+			helperService.changeRequest(helperChangeRequest);			
+			res.setSuccess(true);
+		}catch(Exception e) {
+			res.setSuccess(false);
+			res.setMessage(e.getMessage());
+		}	
+		
+		return res;
 	}
 }

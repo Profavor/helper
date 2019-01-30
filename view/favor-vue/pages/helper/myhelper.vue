@@ -22,7 +22,7 @@
                         <td>{{item.project.projectName}}</td>
                         <td>{{item.helpDate}}</td>
                         <td>
-                            <button class="ui basic button" @click="changeFrontier">
+                            <button class="ui basic button"  @click="changeHelperRequest">
                                 <i class="icon user"></i>
                                 봉사교체 요청
                             </button>
@@ -90,17 +90,16 @@
         <div id="modal" class="iziModal">
             <div class="ui segment">
                 <div class="ui cards">
-                    <div class="card">
+                    <div class="card"> 
                         <div class="content">
                         <div class="header">서동권</div>
                         <div class="description">
-                            봉사일 : 2019-03-22
+                            봉사일 : 2019-03-22 ss
                         </div>
                         </div>
-                        <div class="ui bottom attached button">
-                        <i class="add icon"></i>
-                        Add Friend
-                        </div>
+                       <button class="ui button">
+                        Follow
+                        </button>
                     </div>
                     <div class="card">
                         <div class="content">
@@ -146,7 +145,7 @@ export default {
         }
     },
     methods: {
-        changeFrontier(){
+        changeFrontierPopup(){
             var modal = $('#modal').iziModal({
                 title: '봉사교체 요청',
                 subtitle: '2019-03-21',
@@ -156,13 +155,33 @@ export default {
             });
             modal.iziModal('open');
         },
+
+        async changeHelper(){
+            await this.$axios.post('/api/helper/getProjectShiftListByKnoxId?knoxId='+this.usr.loginId)
+                .then(res => this.projectShifts = res.data).catch(err=> this.$toast.error(err));
+        },
+
+        async changeHelperRequest(){
+            let that = this;
+            await this.$axios.post('/api/helper/changeRequest', {
+                'changeHelper': {
+                    'knoxId': 'test3'
+                },
+                'projectShift': {
+                    'helpDate': '2019-02-13',
+                    'projectId': 'b12ae082687068d30168706c760d0001'
+                }
+            }).then(res => console.log(res)).catch(err=> this.$toast.error(err));
+            
+        },
+
         async getProjectShiftListByKnoxId(){
             let that = this;
             await this.$axios.get('/api/helper/getProjectShiftListByKnoxId?knoxId='+this.usr.loginId)
                 .then(res => this.projectShifts = res.data).catch(err=> this.$toast.error(err));
             
             console.log(this.projectShifts);
-      },
+        },
     }
 }
 </script>

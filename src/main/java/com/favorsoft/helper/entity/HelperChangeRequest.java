@@ -16,11 +16,10 @@ import javax.persistence.UniqueConstraint;
 import org.hibernate.annotations.GenericGenerator;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonFormat;
 import com.favorsoft.shared.entity.BaseEntity;
 
 @Entity
-@Table(name="helper_change_request", uniqueConstraints=@UniqueConstraint(columnNames= {"help_date", "helper_change_id"}))
+@Table(name="helper_change_request", uniqueConstraints=@UniqueConstraint(columnNames= {"project_shift_id", "helper_change_id"}))
 public class HelperChangeRequest extends BaseEntity implements Serializable {
 	
 	/**
@@ -41,15 +40,15 @@ public class HelperChangeRequest extends BaseEntity implements Serializable {
 	
 	private Date requestDate;
 	
-	@JsonFormat(pattern="yyyy-MM-dd")
-	@Column(name = "help_date")
-	private Date helpDate;
+	@ManyToOne(cascade = CascadeType.ALL, targetEntity=ProjectShift.class)
+    @JoinColumn(name="project_shift_id", referencedColumnName = "id", nullable=false)
+	private ProjectShift projectShift;
 	
 	@ManyToOne(cascade = CascadeType.ALL, targetEntity=Helper.class)
     @JoinColumn(name="helper_change_id", referencedColumnName = "id", nullable=false)
 	private Helper changeHelper;
 	
-	private String status;	
+	private String status;
 
 	public String getId() {
 		return id;
@@ -91,11 +90,11 @@ public class HelperChangeRequest extends BaseEntity implements Serializable {
 		this.status = status;
 	}
 
-	public Date getHelpDate() {
-		return helpDate;
+	public ProjectShift getProjectShift() {
+		return projectShift;
 	}
 
-	public void setHelpDate(Date helpDate) {
-		this.helpDate = helpDate;
+	public void setProjectShift(ProjectShift projectShift) {
+		this.projectShift = projectShift;
 	}	
 }
