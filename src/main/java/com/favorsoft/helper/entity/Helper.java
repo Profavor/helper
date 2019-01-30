@@ -1,11 +1,25 @@
 package com.favorsoft.helper.entity;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Transient;
+import javax.persistence.UniqueConstraint;
 
+import org.hibernate.annotations.LazyCollection;
+import org.hibernate.annotations.LazyCollectionOption;
+
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.favorsoft.shared.entity.BaseEntity;
 
 @Entity
@@ -38,6 +52,16 @@ public class Helper extends BaseEntity{
 	
 	@Transient
     private int helpCount;
+	
+	@JsonManagedReference("helperChangeRequests")
+	@LazyCollection(LazyCollectionOption.FALSE)
+	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, targetEntity=HelperChangeRequest.class)
+	private List<HelperChangeRequest> helperChangeRequests = new ArrayList<HelperChangeRequest>();
+	
+	@JsonManagedReference("helperChangeResponses")
+	@LazyCollection(LazyCollectionOption.FALSE)
+	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, targetEntity=HelperChangeResponse.class)
+	private List<HelperChangeResponse> helperChangeResponses = new ArrayList<HelperChangeResponse>();
 	
 	public String getKnoxId() {
 		return knoxId;
