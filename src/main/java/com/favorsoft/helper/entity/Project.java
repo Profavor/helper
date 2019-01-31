@@ -21,10 +21,13 @@ import org.hibernate.annotations.LazyCollection;
 import org.hibernate.annotations.LazyCollectionOption;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import com.favorsoft.shared.entity.BaseEntity;
 
 @Entity
 @Table(name="project")
+@JsonIdentityInfo(generator=ObjectIdGenerators.UUIDGenerator.class)
 public class Project extends BaseEntity{
 	
 	@Id

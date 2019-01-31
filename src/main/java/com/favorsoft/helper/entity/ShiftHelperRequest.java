@@ -17,10 +17,13 @@ import javax.persistence.UniqueConstraint;
 import org.hibernate.annotations.GenericGenerator;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import com.favorsoft.shared.entity.BaseEntity;
 
 @Entity
 @Table(name="shift_helper_request", uniqueConstraints=@UniqueConstraint(columnNames= {"id", "helper_id"}))
+@JsonIdentityInfo(generator=ObjectIdGenerators.UUIDGenerator.class)
 public class ShiftHelperRequest extends BaseEntity{
 	
 	public ShiftHelperRequest() {}

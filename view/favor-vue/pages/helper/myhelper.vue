@@ -22,7 +22,7 @@
                         <td>{{item.project.projectName}}</td>
                         <td>{{item.helpDate}}</td>
                         <td>
-                            <button class="ui basic button"  @click="changeHelperRequest">
+                            <button class="ui basic button"  @click="changeFrontierPopup(item.project.id)">
                                 <i class="icon user"></i>
                                 봉사교체 요청
                             </button>
@@ -34,24 +34,29 @@
         <h5 class="ui attached header">
             봉사 교체 요청 목록
         </h5>
-        <div class="ui attached segment">
+        <div class="ui attached segment">           
             <div class="ui cards">
-                <div class="card">
+                 <div class="card" v-if="helper.helperChangeResponses">
+                     <div class="content">
+                    요청된 봉사교체 목록이 없습니다.
+                    </div>
+                </div>
+                <div class="card" v-for="item in helper.helperChangeResponses" :key="item.id">
                     <div class="content">
                     <img class="right floated mini ui image">
                     <div class="header">
-                        김유현
+                        {{item.changeHelper.userName}}
                     </div>
                     <div class="meta">
-                        2019-03-21
+                        {{item.projectShift.helpDate}}
                     </div>
                     <div class="description">
                        <div class="ui list">
                             <div class="item">
                                 <i class="map marker icon"></i>
                                 <div class="content">
-                                <div class="header">아름다운가게 행궁점</div>
-                                <div class="description">봉사 교체원합니다.</div>
+                                <div class="header">{{item.projectShift.project.projectName}}</div>
+                                <div class="description">{{item.changeHelper.message}}</div>
                                 </div>
                             </div>
                         </div>
@@ -63,68 +68,28 @@
                         <div class="ui basic red button">거부</div>
                     </div>
                     </div>
-                </div>
-                <div class="card">
-                    <div class="content">
-                    <img class="right floated mini ui image">
-                    <div class="header">
-                        Jenny Hess
-                    </div>
-                    <div class="meta">
-                        New Member
-                    </div>
-                    <div class="description">
-                        Jenny wants to add you to the group <b>best friends</b>
-                    </div>
-                    </div>
-                    <div class="extra content">
-                        <div class="ui two buttons">
-                            <div class="ui basic green button">Approve</div>
-                            <div class="ui basic red button">Decline</div>
-                        </div>
-                    </div>
-                </div>
+                </div>                
             </div>
         </div>
 
-        <div id="modal" class="iziModal">
-            <div class="ui segment">
+        <div id="changeHelperRequestModal" class="ui modal">
+            <i class="close icon"></i>
+            <div class="header">
+                봉사자 교체요청
+            </div>
+            <div class="content" style="max-height: 420px; overflow: auto;"> 
                 <div class="ui cards">
-                    <div class="card"> 
+                    <div class="card" v-for="item in changeShifts" :key="item.id"> 
                         <div class="content">
-                        <div class="header">서동권</div>
-                        <div class="description">
-                            봉사일 : 2019-03-22 ss
+                            <div class="header">{{item.helper.userName}}</div>
+                            <div class="description">
+                                봉사일 : {{item.helpDate}}
+                            </div>
                         </div>
-                        </div>
-                       <button class="ui button">
+                       <button class="ui button" >
                         Follow
                         </button>
-                    </div>
-                    <div class="card">
-                        <div class="content">
-                        <div class="header">Veronika Ossi</div>
-                        <div class="description">
-                            Veronika Ossi is a set designer living in New York who enjoys kittens, music, and partying.
-                        </div>
-                        </div>
-                        <div class="ui bottom attached button">
-                        <i class="add icon"></i>
-                        Add Friend
-                        </div>
-                    </div>
-                    <div class="card">
-                        <div class="content">
-                        <div class="header">Jenny Hess</div>
-                        <div class="description">
-                            Jenny is a student studying Media Management at the New School
-                        </div>
-                        </div>
-                        <div class="ui bottom attached button">
-                        <i class="add icon"></i>
-                        Add Friend
-                        </div>
-                    </div>
+                    </div>                    
                 </div>
             </div>
         </div>
@@ -136,24 +101,27 @@
 export default {
     created: function(){
         this.usr = this.$auth.$state.user;
-        this.getProjectShiftListByKnoxId();
+        this.refreshMyHelper();
     },
     data: function(){
         return {
              usr: {},
-             projectShifts: []
+             projectId: '',
+             projectShifts: [],
+             helper: {},
+             changeShifts: []
         }
     },
     methods: {
-        changeFrontierPopup(){
-            var modal = $('#modal').iziModal({
-                title: '봉사교체 요청',
-                subtitle: '2019-03-21',
-                fullscreen: true,
-                width: 625,
+        refreshMyHelper(){
+            this.getProjectShiftListByKnoxId();
+            this.getHelper();
+        },
 
-            });
-            modal.iziModal('open');
+        changeFrontierPopup(projectId){
+            this.projectId = projectId;
+            this.getProjectShiftHelpers();
+            $('#changeHelperRequestModal').modal('show');
         },
 
         async changeHelper(){
@@ -179,9 +147,18 @@ export default {
             let that = this;
             await this.$axios.get('/api/helper/getProjectShiftListByKnoxId?knoxId='+this.usr.loginId)
                 .then(res => this.projectShifts = res.data).catch(err=> this.$toast.error(err));
-            
-            console.log(this.projectShifts);
         },
+
+        async getHelper(){
+            let that = this;
+            await this.$axios.get('/api/helper/getHelper?knoxId='+this.usr.loginId)
+                .then(res => this.helper = res.data).catch(err=> this.$toast.error(err));
+        },
+
+        async getProjectShiftHelpers(){
+            await this.$axios.get('/api/helper/getProjectShiftChangeHelpers?projectId='+this.projectId)
+                .then(res => this.changeShifts = res.data.results).catch(err=> this.$toast.error(err));
+        }
     }
 }
 </script>

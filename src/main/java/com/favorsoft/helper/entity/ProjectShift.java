@@ -24,11 +24,14 @@ import org.hibernate.annotations.LazyCollection;
 import org.hibernate.annotations.LazyCollectionOption;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import com.favorsoft.shared.entity.BaseEntity;
 
 @Entity
 @Table(name="project_shift", uniqueConstraints=@UniqueConstraint(columnNames= {"project_id", "help_date"}) )
+@JsonIdentityInfo(generator=ObjectIdGenerators.UUIDGenerator.class)
 public class ProjectShift extends BaseEntity{
 	
 	@Id
@@ -62,6 +65,9 @@ public class ProjectShift extends BaseEntity{
 	
 	@Transient
     private String projectId;
+	
+	@Transient
+	private Helper helper;
 
 	public String getId() {
 		return id;
@@ -118,5 +124,12 @@ public class ProjectShift extends BaseEntity{
 	public void setRequests(List<ShiftHelperRequest> requests) {
 		this.requests = requests;
 	}
-	
+
+	public Helper getHelper() {
+		return helper;
+	}
+
+	public void setHelper(Helper helper) {
+		this.helper = helper;
+	}	
 }

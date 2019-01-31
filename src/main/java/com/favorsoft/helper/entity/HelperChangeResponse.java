@@ -16,10 +16,13 @@ import javax.persistence.UniqueConstraint;
 import org.hibernate.annotations.GenericGenerator;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import com.favorsoft.shared.entity.BaseEntity;
 
 @Entity
 @Table(name="helper_change_response", uniqueConstraints=@UniqueConstraint(columnNames= {"project_shift_id", "helper_change_id"}))
+@JsonIdentityInfo(generator=ObjectIdGenerators.UUIDGenerator.class)
 public class HelperChangeResponse extends BaseEntity implements Serializable {
 
 	/**
@@ -40,15 +43,19 @@ public class HelperChangeResponse extends BaseEntity implements Serializable {
 	
 	private Date responseDate;
 	
+	@JsonBackReference("projectShift")
 	@ManyToOne(cascade = CascadeType.ALL, targetEntity=ProjectShift.class)
     @JoinColumn(name="project_shift_id", referencedColumnName = "id", nullable=false)
 	private ProjectShift projectShift;
 	
+	@JsonBackReference("changeHelper")
 	@ManyToOne(cascade = CascadeType.ALL, targetEntity=Helper.class)
     @JoinColumn(name="helper_change_id", referencedColumnName = "id", nullable=false)
 	private Helper changeHelper;
 	
 	private String status;	
+	
+	private String message;
 
 	public String getId() {
 		return id;
@@ -97,5 +104,12 @@ public class HelperChangeResponse extends BaseEntity implements Serializable {
 	public void setProjectShift(ProjectShift projectShift) {
 		this.projectShift = projectShift;
 	}
-	
+
+	public String getMessage() {
+		return message;
+	}
+
+	public void setMessage(String message) {
+		this.message = message;
+	}		
 }

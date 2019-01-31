@@ -1,7 +1,11 @@
 package com.favorsoft.helper.controller;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -261,6 +265,44 @@ public class HelperController {
 			res.setSuccess(false);
 			res.setMessage(e.getMessage());
 		}	
+		
+		return res;
+	}
+	
+	@RequestMapping("/getProjectShiftChangeHelpers")
+	public ResponseModel getProjectShiftChangeHelpers(@RequestParam("projectId") String projectId){	
+		Authentication auth =  SecurityContextHolder.getContext().getAuthentication();
+		SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		Project project = helperService.getProject(projectId).get();
+		Calendar cal = Calendar.getInstance();
+		cal.add(Calendar.MONTH, +1);
+		cal.set(Calendar.DAY_OF_MONTH, cal.getActualMaximum(Calendar.DAY_OF_MONTH));
+		Date startDate = new Date();
+		Date endDate = cal.getTime();
+		String strEndDate = formatter.format(endDate);
+		
+		ResponseModel res = new ResponseModel();
+		try {
+			endDate = formatter.parse(strEndDate.substring(0, 10) + " 23:59:59");
+			
+			List<ProjectShift> projectShiftList = helperService.getProjectShiftBetweenHelpDate(project, startDate, endDate);
+			
+			List<ProjectShift> changeShiftHelper = new ArrayList<ProjectShift>();
+			
+			for(ProjectShift projectShift: projectShiftList) {
+				for(Helper helper: projectShift.getHelpers()) {
+					if(!helper.getKnoxId().equals(auth.getName())) {
+						projectShift.setHelper(helper);
+						changeShiftHelper.add(projectShift);
+					}					
+				}
+			}
+			res.setSuccess(true);
+			res.setResults(changeShiftHelper);
+		} catch (Exception e) {
+			res.setSuccess(false);
+			res.setMessage(e.getMessage());
+		}
 		
 		return res;
 	}

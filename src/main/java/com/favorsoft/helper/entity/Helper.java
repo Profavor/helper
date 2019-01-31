@@ -12,14 +12,14 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
-import org.hibernate.annotations.LazyCollection;
-import org.hibernate.annotations.LazyCollectionOption;
-
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import com.favorsoft.shared.entity.BaseEntity;
 
 @Entity
 @Table(name="helper")
+@JsonIdentityInfo(generator=ObjectIdGenerators.None.class)
 public class Helper extends BaseEntity{	
 	@Id
 	@Column(name = "id", length = 128)
@@ -50,12 +50,10 @@ public class Helper extends BaseEntity{
     private int helpCount;
 	
 	@JsonManagedReference("helperChangeRequests")
-	@LazyCollection(LazyCollectionOption.FALSE)
 	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, targetEntity=HelperChangeRequest.class)
 	private List<HelperChangeRequest> helperChangeRequests = new ArrayList<HelperChangeRequest>();
 	
 	@JsonManagedReference("helperChangeResponses")
-	@LazyCollection(LazyCollectionOption.FALSE)
 	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, targetEntity=HelperChangeResponse.class)
 	private List<HelperChangeResponse> helperChangeResponses = new ArrayList<HelperChangeResponse>();
 	
