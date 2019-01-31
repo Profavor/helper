@@ -215,6 +215,15 @@ public class FrontierJob implements Job {
 		sb.append("						</div>");
 		sb.append("					</td>");
 		sb.append("				</tr>");
+		
+		sb.append("				<tr>");
+		sb.append("					<td style='padding: 30 0 0 0;'>");
+		sb.append("						<h4 style='margin-bottom: 5px;'>※ 봉사자 안내 사항</h4>");
+		sb.append("						1. 봉사 전 외근 신청은 필수!");
+		sb.append("						<br>2. 봉사후기를 커뮤니티에 올려주세요.");
+		sb.append("					</td>");
+		sb.append("				</tr>");
+		
 		sb.append("			</table>");
 		sb.append("		</td>");
 		sb.append("	</tr>");
