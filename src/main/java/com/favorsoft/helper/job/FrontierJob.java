@@ -153,7 +153,7 @@ public class FrontierJob implements Job {
 			        try {
 			            MimeMessageHelper messageHelper = new MimeMessageHelper(message, true, "UTF-8");
 			            messageHelper.setSubject("[HELPER] 봉사 안내 메일");
-			            messageHelper.setTo(helper.getKnoxId() + "@miracom.com");
+			            messageHelper.setTo(helper.getKnoxId() + "@miracom.co.kr");
 			            messageHelper.setFrom("labs.prusoft@gmail.com");
 			            messageHelper.setText(makeMail(p.getProjectName(), yyyyMMdd.format(shift.getHelpDate()), p.getDescription(), p.getEducationUrl(), helperList), true);
 			            javaMailSender.send(message);
