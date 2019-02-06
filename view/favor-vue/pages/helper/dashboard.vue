@@ -251,7 +251,6 @@ export default {
           let that = this;
           await this.$axios.get('/api/helper/getProjectShiftList?projectId='+this.projectId+'&projectStatus=CLOSE')
             .then(res => {
-                
                 that.events = [];
                 for(let i = 0; i < res.data.length; i++){
                     for(let j = 0; j < res.data[i].helpers.length; j++){    

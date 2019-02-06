@@ -31,7 +31,7 @@ import com.favorsoft.shared.entity.BaseEntity;
 
 @Entity
 @Table(name="project_shift", uniqueConstraints=@UniqueConstraint(columnNames= {"project_id", "help_date"}) )
-@JsonIdentityInfo(generator=ObjectIdGenerators.UUIDGenerator.class)
+@JsonIdentityInfo(generator=ObjectIdGenerators.None.class)
 public class ProjectShift extends BaseEntity{
 	
 	@Id

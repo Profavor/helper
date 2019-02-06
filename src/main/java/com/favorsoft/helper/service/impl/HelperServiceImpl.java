@@ -106,7 +106,6 @@ public class HelperServiceImpl implements HelperService{
 				quartzService.register(batchJob);
 			}	
 			project = updateProject(tempProject.get(), project);
-			System.out.println(project.toString());
 		}		
 	}
 	
@@ -280,7 +279,7 @@ public class HelperServiceImpl implements HelperService{
 
 	@Override
 	public void changeRequest(HelperChangeRequest helperChangeRequest) {
-		Project project = getProject(helperChangeRequest.getProjectShift().getProjectId()).get();
+		Project project = projectRepository.findById(helperChangeRequest.getProjectShift().getProjectId()).get();
 		Date helpDate = helperChangeRequest.getProjectShift().getHelpDate();		
 		ProjectShift projectShift = getProjectShift(project, helpDate);
 		
@@ -294,15 +293,18 @@ public class HelperServiceImpl implements HelperService{
 		helperChangeRequest.setChangeHelper(responseHelper);
 		helperChangeRequest.setStatus(HELPER_STATUS_REQUEST);
 		reqList.add(helperChangeRequest);
+		requestHelper.setHelperChangeRequests(reqList);
 		
+		ProjectShift changeProjectShift = getProjectShift(project, helperChangeRequest.getChangeHelpDate());
 		List<HelperChangeResponse> resList = responseHelper.getHelperChangeResponses();
 		HelperChangeResponse helperChangeResponse = new HelperChangeResponse();
 		helperChangeResponse.setHelper(responseHelper);				
-		helperChangeResponse.setProjectShift(projectShift);
+		helperChangeResponse.setProjectShift(changeProjectShift);
 		helperChangeResponse.setResponseDate(new Date());
 		helperChangeResponse.setChangeHelper(requestHelper);
 		helperChangeResponse.setStatus(HELPER_STATUS_REQUEST);
 		resList.add(helperChangeResponse);
+		responseHelper.setHelperChangeResponses(resList);
 		
 		helperRepository.save(requestHelper);
 		helperRepository.save(responseHelper);

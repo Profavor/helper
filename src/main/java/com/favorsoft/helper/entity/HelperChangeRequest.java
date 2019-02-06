@@ -11,7 +11,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
-import javax.persistence.UniqueConstraint;
+import javax.persistence.Transient;
 
 import org.hibernate.annotations.GenericGenerator;
 
@@ -21,7 +21,7 @@ import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import com.favorsoft.shared.entity.BaseEntity;
 
 @Entity
-@Table(name="helper_change_request", uniqueConstraints=@UniqueConstraint(columnNames= {"project_shift_id", "helper_change_id"}))
+@Table(name="helper_change_request")
 @JsonIdentityInfo(generator=ObjectIdGenerators.UUIDGenerator.class)
 public class HelperChangeRequest extends BaseEntity implements Serializable {
 	
@@ -50,6 +50,9 @@ public class HelperChangeRequest extends BaseEntity implements Serializable {
 	@ManyToOne(cascade = CascadeType.ALL, targetEntity=Helper.class)
     @JoinColumn(name="helper_change_id", referencedColumnName = "id", nullable=false)
 	private Helper changeHelper;
+	
+	@Transient
+	private Date changeHelpDate;
 	
 	private String status;
 	
@@ -109,6 +112,14 @@ public class HelperChangeRequest extends BaseEntity implements Serializable {
 
 	public void setMessage(String message) {
 		this.message = message;
+	}
+
+	public Date getChangeHelpDate() {
+		return changeHelpDate;
+	}
+
+	public void setChangeHelpDate(Date changeHelpDate) {
+		this.changeHelpDate = changeHelpDate;
 	}		
 	
 }
