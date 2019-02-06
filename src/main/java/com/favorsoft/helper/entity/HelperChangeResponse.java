@@ -11,7 +11,6 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
-import javax.persistence.UniqueConstraint;
 
 import org.hibernate.annotations.GenericGenerator;
 
@@ -21,7 +20,7 @@ import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import com.favorsoft.shared.entity.BaseEntity;
 
 @Entity
-@Table(name="helper_change_response", uniqueConstraints=@UniqueConstraint(columnNames= {"project_shift_id", "helper_change_id"}))
+@Table(name="helper_change_response")
 @JsonIdentityInfo(generator=ObjectIdGenerators.UUIDGenerator.class)
 public class HelperChangeResponse extends BaseEntity implements Serializable {
 
@@ -43,12 +42,10 @@ public class HelperChangeResponse extends BaseEntity implements Serializable {
 	
 	private Date responseDate;
 	
-	@JsonBackReference("projectShift")
 	@ManyToOne(cascade = CascadeType.ALL, targetEntity=ProjectShift.class)
     @JoinColumn(name="project_shift_id", referencedColumnName = "id", nullable=false)
 	private ProjectShift projectShift;
 	
-	@JsonBackReference("changeHelper")
 	@ManyToOne(cascade = CascadeType.ALL, targetEntity=Helper.class)
     @JoinColumn(name="helper_change_id", referencedColumnName = "id", nullable=false)
 	private Helper changeHelper;

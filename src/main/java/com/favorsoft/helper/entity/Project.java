@@ -27,7 +27,7 @@ import com.favorsoft.shared.entity.BaseEntity;
 
 @Entity
 @Table(name="project")
-@JsonIdentityInfo(generator=ObjectIdGenerators.UUIDGenerator.class)
+@JsonIdentityInfo(generator=ObjectIdGenerators.None.class)
 public class Project extends BaseEntity{
 	
 	@Id

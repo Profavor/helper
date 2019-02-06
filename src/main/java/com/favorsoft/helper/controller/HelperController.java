@@ -253,7 +253,7 @@ public class HelperController {
 	}
 	
 	@RequestMapping(value="/changeRequest", method=RequestMethod.POST)
-	public ResponseModel deleteProjectHelper( @RequestBody HelperChangeRequest helperChangeRequest) {
+	public ResponseModel changeHelperRequest( @RequestBody HelperChangeRequest helperChangeRequest) {
 		Authentication auth =  SecurityContextHolder.getContext().getAuthentication();
 		helperChangeRequest.setHelper(helperService.getHelper(auth.getName()));
 		
@@ -292,8 +292,11 @@ public class HelperController {
 			for(ProjectShift projectShift: projectShiftList) {
 				for(Helper helper: projectShift.getHelpers()) {
 					if(!helper.getKnoxId().equals(auth.getName())) {
-						projectShift.setHelper(helper);
-						changeShiftHelper.add(projectShift);
+						ProjectShift p = new ProjectShift();
+						p.setHelper(helper);
+						p.setProject(projectShift.getProject());
+						p.setHelpDate(projectShift.getHelpDate());						
+						changeShiftHelper.add(p);
 					}					
 				}
 			}

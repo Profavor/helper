@@ -22,7 +22,7 @@
                         <td>{{item.project.projectName}}</td>
                         <td>{{item.helpDate}}</td>
                         <td>
-                            <button class="ui basic button"  @click="changeFrontierPopup(item.project.id)">
+                            <button class="ui basic button"  @click="changeFrontierPopup(item)">
                                 <i class="icon user"></i>
                                 봉사교체 요청
                             </button>
@@ -34,6 +34,7 @@
         <h5 class="ui attached header">
             봉사 교체 요청 목록
         </h5>
+        
         <div class="ui attached segment">           
             <div class="ui cards">
                 <div class="card" v-for="item in helper.helperChangeResponses" :key="item.id">
@@ -66,7 +67,7 @@
                 </div>                
             </div>
         </div>
-
+        
         <div id="changeHelperRequestModal" class="ui modal">
             <i class="close icon"></i>
             <div class="header">
@@ -81,8 +82,8 @@
                                 봉사일 : {{item.helpDate}}
                             </div>
                         </div>
-                       <button class="ui button" >
-                        Follow
+                       <button class="ui button" @click="changeHelperRequest(item)">
+                            변경 요청
                         </button>
                     </div>                    
                 </div>
@@ -102,6 +103,7 @@ export default {
         return {
              usr: {},
              projectId: '',
+             changeShiftDate: '',
              projectShifts: [],
              helper: {},
              changeShifts: []
@@ -113,8 +115,9 @@ export default {
             this.getHelper();
         },
 
-        changeFrontierPopup(projectId){
-            this.projectId = projectId;
+        changeFrontierPopup(item){
+            this.projectId = item.project.id;
+            this.changeShiftDate = item.helpDate;
             this.getProjectShiftHelpers();
             $('#changeHelperRequestModal').modal('show');
         },
@@ -124,16 +127,17 @@ export default {
                 .then(res => this.projectShifts = res.data).catch(err=> this.$toast.error(err));
         },
 
-        async changeHelperRequest(){
+        async changeHelperRequest(item){      
             let that = this;
             await this.$axios.post('/api/helper/changeRequest', {
                 'changeHelper': {
-                    'knoxId': 'test3'
+                    'knoxId': item.helper.knoxId
                 },
                 'projectShift': {
-                    'helpDate': '2019-02-13',
-                    'projectId': 'b12ae082687068d30168706c760d0001'
-                }
+                    'helpDate': item.helpDate,
+                    'projectId': that.projectId
+                },
+                'changeHelpDate': that.changeShiftDate
             }).then(res => console.log(res)).catch(err=> this.$toast.error(err));
             
         },
@@ -152,7 +156,7 @@ export default {
 
         async getProjectShiftHelpers(){
             await this.$axios.get('/api/helper/getProjectShiftChangeHelpers?projectId='+this.projectId)
-                .then(res => this.changeShifts = res.data.results).catch(err=> this.$toast.error(err));
+                .then(res => this.changeShifts = res.data.results).catch(err=> this.$toast.error(err)); 
         }
     }
 }
