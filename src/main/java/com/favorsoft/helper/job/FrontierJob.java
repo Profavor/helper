@@ -63,7 +63,7 @@ public class FrontierJob implements Job {
 					int random = rand.nextInt(shiftRequestList.size());
 					ShiftHelperRequest req = shiftRequestList.get(random);
 
-					if (existMonthHelper(req.getHelper().getKnoxId(), addHelperList)) {
+					if (existMonthHelper(req.getHelper().getKnoxId(), addHelperList, shift.getHelpDate())) {
 						// 이미 존재하는 아이디는 Request 명단에서 제외 밑 Status 변경
 						req.setStatus("MONTH_EXIST");
 						helperService.saveShiftHelperRequest(req);
@@ -105,7 +105,7 @@ public class FrontierJob implements Job {
 
 				Helper helper = minHelperList.get(random);
 
-				if (!existMonthHelper(helper.getKnoxId(), addHelperList)) {
+				if (!existMonthHelper(helper.getKnoxId(), addHelperList, shift.getHelpDate())) {
 					shift.getHelpers().add(helper);
 					count++;
 					addHelperList.add(helper);
@@ -119,53 +119,24 @@ public class FrontierJob implements Job {
 			}
 		}
 		
-		
-		SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-
-		Calendar cal = Calendar.getInstance();
-		cal.add(Calendar.MONTH, +1);
-		cal.set(Calendar.DAY_OF_MONTH, cal.getActualMinimum(Calendar.DAY_OF_MONTH));
-		Date startDate = cal.getTime();
-		String strStartDate = formatter.format(startDate);
-		cal.set(Calendar.DAY_OF_MONTH, cal.getActualMaximum(Calendar.DAY_OF_MONTH));
-		Date endDate = cal.getTime();
-		String strEndDate = formatter.format(endDate);
-		try {
-			startDate = formatter.parse(strStartDate.substring(0, 10) + " 00:00:00");
-			endDate = formatter.parse(strEndDate.substring(0, 10) + " 23:59:59");
-		} catch (ParseException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		// 전체 프로젝트 리스트를 불러온다 (종료된 프로젝트 포함)
-		List<Project> projectList = helperService.getProjectList(false);
-
-		for (Project p : projectList) {
-			
-			List<ProjectShift> sList = helperService.getProjectShiftBetweenHelpDate(p, startDate, endDate);
-
-			for (ProjectShift shift : sList) {
-				List<Helper> helperList = shift.getHelpers();
-				for (Helper helper : helperList) {
-					
-					MimeMessage message = javaMailSender.createMimeMessage();
-					
-			        try {
-			            MimeMessageHelper messageHelper = new MimeMessageHelper(message, true, "UTF-8");
-			            messageHelper.setSubject("[HELPER] 봉사 안내 메일");
-			            messageHelper.setTo(helper.getKnoxId() + "@miracom.co.kr");
-			            messageHelper.setFrom("labs.prusoft@gmail.com");
-			            messageHelper.setText(makeMail(p.getProjectName(), yyyyMMdd.format(shift.getHelpDate()), p.getDescription(), p.getEducationUrl(), helperList), true);
-			            javaMailSender.send(message);
-			            
-			        } catch (MessagingException e) {
-			            e.printStackTrace();
-			        }
-					
-				}
+		// 봉사자 Mail 보내기
+		for (ProjectShift shift : projectShiftList) {
+			List<Helper> helperList = shift.getHelpers();
+			for (Helper helper : helperList) {				
+				MimeMessage message = javaMailSender.createMimeMessage();				
+		        try {
+		            MimeMessageHelper messageHelper = new MimeMessageHelper(message, true, "UTF-8");
+		            messageHelper.setSubject("[HELPER] 봉사 안내 메일");
+		            messageHelper.setTo(helper.getKnoxId() + "@miracom.co.kr");
+		            messageHelper.setFrom("labs.prusoft@gmail.com");
+		            messageHelper.setText(makeMail(shift.getProject().getProjectName(), yyyyMMdd.format(shift.getHelpDate()), shift.getProject().getDescription(), shift.getProject().getEducationUrl(), helperList), true);
+		            javaMailSender.send(message);
+		            
+		        } catch (MessagingException e) {
+		            e.printStackTrace();
+		        }				
 			}
-		}
-		
+		}		
 	}
 
 	public String makeMail(String projectName, String helpDate, String description, String url, List<Helper> helperList) {
@@ -272,11 +243,12 @@ public class FrontierJob implements Job {
 	}
 
 	// 봉사는 한달에 한번 갈 수 있다. 즉 한달 기간동안의 봉사자만 추리도록 변경
-	private boolean existMonthHelper(String knoxId, List<Helper> addHelperList) {
+	private boolean existMonthHelper(String knoxId, List<Helper> addHelperList, Date helpDate) {
 		SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
 		Calendar cal = Calendar.getInstance();
-		cal.add(Calendar.MONTH, +1);
+		cal.setTime(helpDate);
+
 		cal.set(Calendar.DAY_OF_MONTH, cal.getActualMinimum(Calendar.DAY_OF_MONTH));
 		Date startDate = cal.getTime();
 		String strStartDate = formatter.format(startDate);

@@ -36,11 +36,6 @@
         </h5>
         <div class="ui attached segment">           
             <div class="ui cards">
-                 <div class="card" v-if="helper.helperChangeResponses">
-                     <div class="content">
-                    요청된 봉사교체 목록이 없습니다.
-                    </div>
-                </div>
                 <div class="card" v-for="item in helper.helperChangeResponses" :key="item.id">
                     <div class="content">
                     <img class="right floated mini ui image">
