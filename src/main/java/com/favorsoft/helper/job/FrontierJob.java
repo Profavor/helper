@@ -119,7 +119,8 @@ public class FrontierJob implements Job {
 			}
 		}
 		
-		// 봉사자 Mail 보내기
+		// 메일 보내기
+		// 1. 선정됨 봉사자에게 메일
 		for (ProjectShift shift : projectShiftList) {
 			List<Helper> helperList = shift.getHelpers();
 			for (Helper helper : helperList) {				
@@ -128,6 +129,7 @@ public class FrontierJob implements Job {
 		            MimeMessageHelper messageHelper = new MimeMessageHelper(message, true, "UTF-8");
 		            messageHelper.setSubject("[HELPER] 봉사 안내 메일");
 		            messageHelper.setTo(helper.getKnoxId() + "@miracom.co.kr");
+		            messageHelper.setCc("ehli@nate.com");
 		            messageHelper.setFrom("labs.prusoft@gmail.com");
 		            messageHelper.setText(makeMail(shift.getProject().getProjectName(), yyyyMMdd.format(shift.getHelpDate()), shift.getProject().getDescription(), shift.getProject().getEducationUrl(), helperList), true);
 		            javaMailSender.send(message);
@@ -136,8 +138,91 @@ public class FrontierJob implements Job {
 		            e.printStackTrace();
 		        }				
 			}
-		}		
+		}	
+		
+		// 2. 담당자에게 선정된 시트와 봉사자 확인 메일
+		try {
+			MimeMessage message = javaMailSender.createMimeMessage();
+			MimeMessageHelper messageHelper = new MimeMessageHelper(message, true, "UTF-8");
+			messageHelper.setSubject("[HELPER] 봉사자 선정 메일");
+			messageHelper.setTo("profavor.lin@miracom.co.kr");
+			messageHelper.setCc("ehli@nate.com");
+			messageHelper.setFrom("labs.prusoft@gmail.com");
+			messageHelper.setText(makeMail4admin(project, projectShiftList), true);
+			javaMailSender.send(message);
+			
+		} catch (MessagingException e) {
+			e.printStackTrace();
+		}
 	}
+	
+	public String makeMail4admin(Project project, List<ProjectShift> projectShiftList) {
+		
+		StringBuffer sb = new StringBuffer();
+		
+		sb.append("<meta charset='utf-8' />");
+		sb.append("<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1' />");
+		sb.append("<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1.0'>");
+		sb.append("<table align='center' border='0' cellpadding='0' cellspacing='0' width='500' style='color: #5a5252;'>");
+		sb.append("	<tr>");
+		sb.append("		<td style='font-size: 0; line-height: 0;' height='10'>&nbsp;</td>");
+		sb.append("	</tr>");
+		sb.append("	<tr>");
+		sb.append("		<td align='center'>");
+		sb.append("			<h1 style='font-family: Impact, Charcoal, sans-serif; font-weight: bold; font-size: 80px; margin: 0px 0px 0px 0px'>");
+		sb.append("				HELPER.");
+		sb.append("			</h1>");
+		sb.append("		</td>");
+		sb.append("	</tr>");
+		sb.append("	<tr>");
+		sb.append("		<td align='center'>");
+		sb.append("			<h2 style='margin: 0px 0px 0px 0px'>봉사자 선정 메일</h2>");
+		sb.append("			<div>");
+		sb.append("				아래와 같이 봉사자가 선정 되었습니다.");
+		sb.append("			</div>");
+		sb.append("		</td>");
+		sb.append("	</tr>");
+		sb.append("	<tr>");
+		sb.append("		<td bgcolor='#ffffff' style='padding: 10px 30px 20px 30px;'>");
+		sb.append("			<table border='0' cellpadding='0' cellspacing='0' width='100%'>");
+		sb.append("				<tr>");
+		sb.append("					<td>");
+		sb.append("						<h3 style='margin-bottom: 10px'>봉사</h3>");
+		sb.append("						<div>"+ project.getProjectName() +"</div>");
+		sb.append("						<div style='font-size: 14px; margin: 4px'>"+ project.getDescription() +"</div>");
+		sb.append("						<h3 style='margin-bottom: 10px'>일자별 봉사자</h3>");
+		
+		for (ProjectShift shift : projectShiftList) {
+			
+			List<Helper> helperList = shift.getHelpers();
+			if(helperList.size() == 0) continue;
+			
+			sb.append("						<div style='margin: 5px 5px 15px 5px'>");
+			sb.append("							<div style='margin: 6px'>"+yyyyMMdd.format(shift.getHelpDate())+"</div>");
+			
+			for (Helper helper : helperList) {	
+				sb.append("							<div style='font-size: 14px; margin: 5px 5px 5px 10px'>"+helper.getUserName()+" "+helper.getKnoxId()+"@miracom.co.kr</div>");
+			}
+			sb.append("						</div>");
+		}
+	
+		sb.append("					</td>");
+		sb.append("				</tr>");
+		sb.append("			</table>");
+		sb.append("		</td>");
+		sb.append("	</tr>");
+		sb.append("	<tr>");
+		sb.append("		<td bgcolor='#ee4c50' style='text-align: center; padding: 10px 0 10px 0;'>");
+		sb.append("			<a style='font-weight: bold; color: #ffffff; font-size: 15px; text-decoration: none;' href='http://labs.prusoft.space' target='_blank'>");
+		sb.append("				http://labs.prusoft.space");
+		sb.append("			</a>");
+		sb.append("		</td>");
+		sb.append("	</tr>");
+		sb.append("</table>");
+		
+		return sb.toString();
+	}
+
 
 	public String makeMail(String projectName, String helpDate, String description, String url, List<Helper> helperList) {
 		
@@ -152,12 +237,12 @@ public class FrontierJob implements Job {
 		sb.append("	</tr>");
 		sb.append("	<tr>");
 		sb.append("		<td align='center'>");
-		sb.append("			<h1 style='font-family: Impact, Charcoal, sans-serif; font-weight: bold; font-size: 80px; margin:0 0 0 0'>HELPER.</h1>");
+		sb.append("			<h1 style='font-family: Impact, Charcoal, sans-serif; font-weight: bold; font-size: 80px; margin:0px 0px 0px 0px'>HELPER.</h1>");
 		sb.append("		</td>");
 		sb.append("	</tr>");
 		sb.append("	<tr>");
 		sb.append("		<td align='center'>");
-		sb.append("			<h2 style='margin: 0 0 0 0'>봉사 안내 메일</h2>");
+		sb.append("			<h2 style='margin: 0px 0px 0px 0px'>봉사 안내 메일</h2>");
 		sb.append("		</td>");
 		sb.append("	</tr>");
 		sb.append("	<tr>");
@@ -188,7 +273,7 @@ public class FrontierJob implements Job {
 		sb.append("				</tr>");
 		
 		sb.append("				<tr>");
-		sb.append("					<td style='padding: 30 0 0 0;'>");
+		sb.append("					<td style='padding: 30px 0px 0px 0px;'>");
 		sb.append("						<h4 style='margin-bottom: 5px;'>※ 봉사자 안내 사항</h4>");
 		sb.append("						1. 봉사 전 외근 신청은 필수!");
 		sb.append("						<br>2. 봉사후기를 커뮤니티에 올려주세요.");
@@ -207,7 +292,6 @@ public class FrontierJob implements Job {
 		
 		return sb.toString();
 	}
-	
 	
 	
     public void sendSimpleMessage(String to, String subject, String text) {
