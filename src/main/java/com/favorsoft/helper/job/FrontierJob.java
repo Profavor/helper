@@ -237,7 +237,9 @@ public class FrontierJob implements Job {
 					}
 				}
 			}
-			frontierHelper.add(helper);
+			if(helper.isEnable()) {
+				frontierHelper.add(helper);
+			}			
 		}
 		return frontierHelper;
 	}
