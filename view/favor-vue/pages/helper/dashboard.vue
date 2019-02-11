@@ -61,7 +61,7 @@
                         </tbody>
                     </table>
                     <div class="ui tiny header">프론티어 지원 
-                        <button class="ui right floated mini basic button" style="margin-top: -5px;" @click="addProjectShift" v-if="projectId != '' && existAuth('ROLE_HELPER_USER')"><i class="icon user"></i>Shift 추가</button>
+                        <button class="ui right floated mini basic button" style="margin-top: -5px;" @click="addProjectShift" v-if="projectId != '' && existAuth('ROLE_HELPER_ADMIN')"><i class="icon user"></i>Shift 추가</button>
                     </div>
                     <table class="ui table">
                         <colgroup>
@@ -221,6 +221,8 @@ export default {
       async getUser(){
           return await this.$auth.fetchUser();
       },
+
+      
       async getProjectDropdown(){
           let that = this;
           await this.$axios.get('/api/helper/project/list/dropdown').then(res => this.dropdownProject = res.data).catch(err => console.log(err));
