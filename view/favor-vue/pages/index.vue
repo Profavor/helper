@@ -3,6 +3,7 @@
         <table class="ui celled padded table">
   <thead>
     <tr><th class="single line">봉사횟수</th>
+    <th>Knox ID</th>
     <th>이름</th>
     <th>부서</th>
   </tr></thead>
@@ -10,6 +11,9 @@
     <tr v-for="item in helpers" :key="item.knoxId">
       <td>
         <h2 class="ui center aligned header">{{item.helpCount}}</h2>
+      </td>
+      <td>
+        {{item.knoxId}}
       </td>
       <td class="single line">
         {{item.userName}}
