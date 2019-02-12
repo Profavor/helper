@@ -58,8 +58,8 @@ public class FrontierJob implements Job {
 						.collect(Collectors.toList());
 
 				Random rand = new Random();
-
-				for (int i = 0; i < shiftRequestList.size(); i++) {
+				int size = shiftRequestList.size();
+				for (int i = 0; i < size; i++) {
 					int random = rand.nextInt(shiftRequestList.size());
 					ShiftHelperRequest req = shiftRequestList.get(random);
 
