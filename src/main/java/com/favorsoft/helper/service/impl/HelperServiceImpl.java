@@ -218,6 +218,7 @@ public class HelperServiceImpl implements HelperService{
 		oldProject.setStatus(newProject.getStatus());
 		oldProject.setTriggerValue(newProject.getTriggerValue());
 		oldProject.setOwner(newProject.getOwner());
+		oldProject.setMaxHelperCount(newProject.getMaxHelperCount());
 		oldProject.setEducationUrl(newProject.getEducationUrl());
 		return projectRepository.saveAndFlush(oldProject);
 	}
