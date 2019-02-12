@@ -8,7 +8,6 @@ import org.quartz.SchedulerException;
 
 import com.favorsoft.helper.entity.Helper;
 import com.favorsoft.helper.entity.HelperChangeRequest;
-import com.favorsoft.helper.entity.HelperChangeResponse;
 import com.favorsoft.helper.entity.Project;
 import com.favorsoft.helper.entity.ProjectShift;
 import com.favorsoft.helper.entity.ShiftHelperRequest;
@@ -54,5 +53,6 @@ public interface HelperService {
 	
 	public void changeRequest(HelperChangeRequest helperChangeRequest);
 	
+	public List<Helper> getHelperListWithCount();
 
 }

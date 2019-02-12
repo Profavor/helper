@@ -309,4 +309,26 @@ public class HelperServiceImpl implements HelperService{
 		helperRepository.save(requestHelper);
 		helperRepository.save(responseHelper);
 	}
+
+	@Override
+	public List<Helper> getHelperListWithCount() {
+		List<Helper> helperList = helperRepository.findAll();
+		
+		for(Helper helper: helperList) {
+			List<Project> allProject = getProjectList(false);
+			for (Project projects : allProject) {
+				List<ProjectShift> allShiftList = getProjectShiftList(projects.getId(), null);
+				for (ProjectShift shift : allShiftList) {
+					List<Helper> tempHelperList = shift.getHelpers();
+					for (Helper tempHelper : tempHelperList) {
+						if (helper.getKnoxId().equals(tempHelper.getKnoxId())) {
+							helper.setHelpCount(helper.getHelpCount() + 1);
+						}
+					}
+				}
+			}			
+		}
+		
+		return helperList;
+	}
 }

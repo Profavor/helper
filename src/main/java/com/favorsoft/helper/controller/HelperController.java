@@ -1,6 +1,5 @@
 package com.favorsoft.helper.controller;
 
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -307,6 +306,19 @@ public class HelperController {
 			res.setMessage(e.getMessage());
 		}
 		
+		return res;
+	}
+	
+	@RequestMapping("/getHelperListWithCount")
+	public ResponseModel getHelperList() {
+		ResponseModel res = new ResponseModel();
+		try {
+			res.setResults(helperService.getHelperListWithCount().stream().sorted(Comparator.comparing(Helper::getHelpCount).reversed()).collect(Collectors.toList()));
+			res.setSuccess(true);
+		}catch(Exception e) {
+			res.setSuccess(false);
+			res.setMessage(e.getMessage());
+		}
 		return res;
 	}
 }

@@ -10,17 +10,13 @@
     </div>
   </div>
   <div class="ui menu">
-  <div class="header item">
+  <nuxt-link to="/" class="header item">
     Helper 3.0
-  </div>
+  </nuxt-link>
   <nuxt-link to="/helper" class="item">
     봉사활동
   </nuxt-link>
-  <a class="item">
-    Jobs
-  </a>
   <div class="right menu">
-    <a class="item">My info.</a>
     <a class="item"><div class="ui primary button"  @click="logout">Logout</div></a>
   </div>
   </div>
