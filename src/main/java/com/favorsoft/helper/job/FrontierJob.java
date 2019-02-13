@@ -42,7 +42,7 @@ public class FrontierJob implements Job {
     public JavaMailSender javaMailSender;
 	
 	@Override
-	@Transactional
+	@Transactional(rollbackOn=Exception.class)
 	public void execute(JobExecutionContext context) throws JobExecutionException {
 		String projectId = (String) context.getMergedJobDataMap().get("projectId");
 
@@ -66,12 +66,9 @@ public class FrontierJob implements Job {
 					if (existMonthHelper(req.getHelper().getKnoxId(), addHelperList, shift.getHelpDate())) {
 						// 이미 존재하는 아이디는 Request 명단에서 제외 밑 Status 변경
 						req.setStatus("MONTH_EXIST");
-						//helperService.saveShiftHelperRequest(req);
 						shiftRequestList.remove(random);
 					} else if(shift.getHelpers().size() < project.getMaxHelperCount()) {
 						req.setStatus("SUCCESS");
-						//helperService.saveShiftHelperRequest(req);
-
 						shift.getHelpers().add(req.getHelper());
 						addHelperList.add(req.getHelper());
 						shiftRequestList.remove(random);						
@@ -84,7 +81,6 @@ public class FrontierJob implements Job {
 
 				for (ShiftHelperRequest reqs : shiftRequestList) {
 					reqs.setStatus("FAIL");
-					//helperService.saveShiftHelperRequest(reqs);
 				}
 			}
 		}
