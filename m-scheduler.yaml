@@ -67,3 +67,10 @@ spec:
           value: '8001'
         ports:
         - containerPort: 8001
+        volumeMounts:
+        - name: timezone-config
+          mountPath: /etc/localtime
+      volumes:
+      - name: timezone-config
+        hostPath:
+          path: /usr/share/zoneinfo/Asia/Seoul

@@ -59,33 +59,32 @@ public class FrontierJob implements Job {
 
 				Random rand = new Random();
 
-				for (int i = 0; i < shiftRequestList.size(); i++) {
+				while (!shiftRequestList.isEmpty()) {
 					int random = rand.nextInt(shiftRequestList.size());
 					ShiftHelperRequest req = shiftRequestList.get(random);
 
 					if (existMonthHelper(req.getHelper().getKnoxId(), addHelperList, shift.getHelpDate())) {
 						// 이미 존재하는 아이디는 Request 명단에서 제외 밑 Status 변경
 						req.setStatus("MONTH_EXIST");
-						helperService.saveShiftHelperRequest(req);
+						//helperService.saveShiftHelperRequest(req);
 						shiftRequestList.remove(random);
-					} else {
+					} else if(shift.getHelpers().size() < project.getMaxHelperCount()) {
 						req.setStatus("SUCCESS");
-						helperService.saveShiftHelperRequest(req);
+						//helperService.saveShiftHelperRequest(req);
 
 						shift.getHelpers().add(req.getHelper());
 						addHelperList.add(req.getHelper());
-						shiftRequestList.remove(random);
-						
+						shiftRequestList.remove(random);						
 					}
 
-					if (shift.getHelpers().size() == project.getMaxHelperCount()) {
+					if (shift.getHelpers().size() >= project.getMaxHelperCount()) {
 						break;
 					}
 				}
 
 				for (ShiftHelperRequest reqs : shiftRequestList) {
 					reqs.setStatus("FAIL");
-					helperService.saveShiftHelperRequest(reqs);
+					//helperService.saveShiftHelperRequest(reqs);
 				}
 			}
 		}

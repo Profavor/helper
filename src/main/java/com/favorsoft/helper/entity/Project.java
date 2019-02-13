@@ -45,10 +45,10 @@ public class Project extends BaseEntity{
 	@Column(nullable=false)
 	private int maxHelperCount;
 	
-	@JsonFormat(pattern="yyyy-MM-dd")
+	@JsonFormat(pattern="yyyy-MM-dd", timezone="Asia/Seoul")
 	private Date startDate;
 	
-	@JsonFormat(pattern="yyyy-MM-dd")
+	@JsonFormat(pattern="yyyy-MM-dd", timezone="Asia/Seoul")
 	private Date endDate;
 	
 	private String status;

@@ -44,7 +44,7 @@ public class ProjectShift extends BaseEntity{
     @JoinColumn(name="project_id", referencedColumnName = "id", nullable=false)
     private Project project;
 	
-	@JsonFormat(pattern="yyyy-MM-dd")
+    @JsonFormat(pattern="yyyy-MM-dd", timezone="Asia/Seoul")
 	@Column(name="help_date")
 	private Date helpDate;
 	

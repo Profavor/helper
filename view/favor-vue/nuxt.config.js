@@ -70,7 +70,8 @@ module.exports = {
     '@nuxtjs/auth',
     '@nuxtjs/proxy',
     '@nuxtjs/toast',
-    '@nuxt/babel-preset-app'
+    '@nuxt/babel-preset-app',
+    ['@nuxtjs/moment', { locales: ['ko'], defaultLocale: 'ko' }]
   ],
   /*
   ** Axios module configuration

@@ -19,4 +19,11 @@ spec:
         imagePullPolicy: Always
         name: helper
         ports:
-        - containerPort: 3000    
+        - containerPort: 3000 
+        volumeMounts:
+        - name: timezone-config
+          mountPath: /etc/localtime
+      volumes:
+      - name: timezone-config
+        hostPath:
+          path: /usr/share/zoneinfo/Asia/Seoul
